@@ -1,0 +1,96 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String         @default("Dr. Elena Vance")
+  email         String?        @unique @default("elena.vance@stanford.edu")
+  role          String         @default("Lead Investigator")
+  avatarUrl     String?
+  documents     Document[]
+  conversations Conversation[]
+  createdAt     DateTime       @default(now())
+}
+
+model Document {
+  id                    String                 @id @default(cuid())
+  name                  String
+  fileUrl               String?
+  fileType              String                 @default("pdf")
+  fileSize              Int                    @default(0)
+  pages                 Int                    @default(1)
+  wordCount             Int                    @default(0)
+  indexHealth           Float                  @default(98.4)
+  status                String                 @default("ready") // uploading | processing | ready | failed
+  progress              Int                    @default(100)
+  step                  String?
+  transferRate          String?
+  timeRemaining         String?
+  errorMsg              String?
+  errorCode             String?
+  inContext             Boolean                @default(true)
+  uploadedBy            String                 @default("Dr. Elena Vance")
+  uploadedAt            String?
+  textContent           String?                @db.Text
+  parsedMarkdown        String?                @db.Text
+  rawText               String?                @db.Text
+  tablesCount           Int                    @default(0)
+  chunksCount           Int                    @default(0)
+  embeddingModel        String                 @default("text-embedding-3-large")
+  tokensCount           Int                    @default(0)
+  userId                String?
+  user                  User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  chunks                DocumentChunk[]
+  conversationDocuments ConversationDocument[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+}
+
+model DocumentChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  chunkIndex Int      @default(0)
+  content    String   @db.Text
+  relevance  Float    @default(0.9)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model Conversation {
+  id                    String                 @id @default(cuid())
+  title                 String                 @default("New Research Chat")
+  userId                String?
+  user                  User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages              Message[]
+  conversationDocuments ConversationDocument[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+}
+
+model ConversationDocument {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  documentId     String
+  document       Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, documentId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String       // user | assistant
+  content        String       @db.Text
+  structuredData Json?
+  createdAt      DateTime     @default(now())
+}
