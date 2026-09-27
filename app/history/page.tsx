@@ -10,7 +10,7 @@ import { ConversationItem } from '@/types';
 const INITIAL_DEMO_HISTORY: ConversationItem[] = [
   {
     id: 'conv-1',
-    title: 'Quantum Error Mitigation',
+    title: 'Giảm thiểu sai số lượng tử',
     createdAt: new Date().toISOString(),
     updatedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     messages: [
@@ -18,28 +18,28 @@ const INITIAL_DEMO_HISTORY: ConversationItem[] = [
         id: 'm1',
         conversationId: 'conv-1',
         role: 'user',
-        content: 'Evaluate quantum error mitigation algorithms on noisy intermediate-scale quantum devices.',
+        content: 'Đánh giá các thuật toán giảm thiểu sai số lượng tử trên các thiết bị trung gian.',
         createdAt: new Date().toISOString(),
       },
     ],
   },
   {
     id: 'conv-2',
-    title: 'Multi-agent consensus check',
+    title: 'Kiểm tra đồng thuận đa tác nhân',
     createdAt: new Date().toISOString(),
     updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     messages: [],
   },
   {
     id: 'conv-3',
-    title: 'Latent Space Optimization',
+    title: 'Tối ưu hóa không gian tiềm ẩn',
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     messages: [],
   },
   {
     id: 'conv-4',
-    title: 'Annual Report Risk Breakdown',
+    title: 'Phân tích rủi ro báo cáo thường niên',
     createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
     messages: [],
@@ -120,11 +120,11 @@ export default function HistoryPage() {
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-[24px]">history</span>
               <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-                Synthesis History
+                Lịch sử nghiên cứu
               </h1>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-              Review past multi-agent research dialogues, inspect citations, and continue previous inquiries.
+              Xem lại các cuộc hội thoại nghiên cứu trước đây, kiểm tra trích dẫn và tiếp tục phiên làm việc.
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export default function HistoryPage() {
             className="inline-flex items-center gap-2 px-space-md py-2 rounded-lg bg-primary hover:bg-primary-fixed text-on-primary font-body-sm text-body-sm font-medium transition-all shadow-md shrink-0 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
-            New Session
+            Phiên mới
           </button>
         </div>
 
@@ -147,7 +147,7 @@ export default function HistoryPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search past research sessions by topic or question..."
+            placeholder="Tìm kiếm phiên nghiên cứu theo chủ đề hoặc câu hỏi..."
             className="w-full bg-surface pl-10 pr-4 py-2.5 rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline border border-outline-variant/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-xs"
           />
         </div>
@@ -158,9 +158,9 @@ export default function HistoryPage() {
             <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center mb-3 text-outline">
               <span className="material-symbols-outlined text-[32px]">chat_bubble_outline</span>
             </div>
-            <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">No conversations found</h3>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Không tìm thấy cuộc trò chuyện nào</h3>
             <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm mt-1">
-              {searchQuery ? 'No conversations match your query.' : 'You have not conducted any research sessions yet.'}
+              {searchQuery ? 'Không có cuộc trò chuyện nào khớp với tìm kiếm.' : 'Bạn chưa thực hiện phiên nghiên cứu nào.'}
             </p>
           </div>
         ) : (
@@ -170,7 +170,7 @@ export default function HistoryPage() {
               <div className="space-y-space-xs">
                 <span className="font-label-xs text-label-xs uppercase tracking-wider text-outline px-1 font-semibold flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  Today
+                  Hôm nay
                 </span>
                 <div className="space-y-2.5">
                   {grouped.today.map((conv) => (
@@ -184,7 +184,7 @@ export default function HistoryPage() {
             {grouped.yesterday.length > 0 && (
               <div className="space-y-space-xs">
                 <span className="font-label-xs text-label-xs uppercase tracking-wider text-outline px-1 font-semibold block">
-                  Yesterday
+                  Hôm qua
                 </span>
                 <div className="space-y-2.5">
                   {grouped.yesterday.map((conv) => (
@@ -198,7 +198,7 @@ export default function HistoryPage() {
             {grouped.older.length > 0 && (
               <div className="space-y-space-xs">
                 <span className="font-label-xs text-label-xs uppercase tracking-wider text-outline px-1 font-semibold block">
-                  Older
+                  Cũ hơn
                 </span>
                 <div className="space-y-2.5">
                   {grouped.older.map((conv) => (
@@ -240,9 +240,9 @@ function ConversationRow({
             {conv.title}
           </h3>
           <p className="font-label-xs text-label-xs text-outline mt-0.5 flex items-center gap-2">
-            <span>{conv.messages?.length || 0} messages</span>
+            <span>{conv.messages?.length || 0} tin nhắn</span>
             <span>•</span>
-            <span>Last updated at {timeFormatted}</span>
+            <span>Cập nhật lúc {timeFormatted}</span>
           </p>
         </div>
       </div>
@@ -252,7 +252,7 @@ function ConversationRow({
           type="button"
           onClick={(e) => onDelete(e, conv.id)}
           className="p-2 rounded-lg text-outline hover:text-error hover:bg-error-container/20 transition-all active:scale-90 cursor-pointer"
-          title="Delete conversation"
+          title="Xóa cuộc trò chuyện"
         >
           <span className="material-symbols-outlined text-[18px]">delete</span>
         </button>

@@ -43,7 +43,7 @@ export function ResearchWorkspace({
 
   const initialQueryHandledRef = useRef(false);
 
-  // 1. Load documents and initial conversation on mount
+  // 1. Tải danh sách tài liệu và cuộc trò chuyện ban đầu
   useEffect(() => {
     async function loadData() {
       try {
@@ -58,7 +58,7 @@ export function ResearchWorkspace({
           const docsJson = await docsRes.json();
           if (docsJson.success && Array.isArray(docsJson.data)) {
             setDocuments(docsJson.data);
-            // Default select ready documents
+            // Mặc định chọn các tài liệu ở trạng thái sẵn sàng
             const readyIds = docsJson.data
               .filter((d: DocumentItem) => d.status.toLowerCase() === 'ready')
               .map((d: DocumentItem) => d.id);
@@ -76,22 +76,22 @@ export function ResearchWorkspace({
           }
         }
       } catch (err) {
-        console.warn('ResearchWorkspace initial load warning:', err);
+        console.warn('Lỗi tải dữ liệu ban đầu cho ResearchWorkspace:', err);
       }
     }
 
     loadData();
   }, [initialConversationId]);
 
-  // 2. Handle sending message with real-time streaming
+  // 2. Gửi câu hỏi và nhận stream thời gian thực
   const handleSendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed || chatStatus === 'loading' || chatStatus === 'streaming') return;
 
-      // Section XXXI: Edge case - No document selected
+      // Xử lý trường hợp chưa chọn tài liệu
       if (selectedDocIds.length === 0) {
-        setErrorMessage('Upload at least one document to start research.');
+        setErrorMessage('Tải lên ít nhất một tài liệu để bắt đầu nghiên cứu.');
         return;
       }
 
@@ -104,7 +104,7 @@ export function ResearchWorkspace({
         setConversationId(activeConvId);
       }
 
-      // Append user message immediately
+      // Thêm ngay câu hỏi của người dùng vào giao diện
       const userMsg: MessageItemType = {
         id: `user-${Date.now()}`,
         conversationId: activeConvId,
@@ -128,12 +128,12 @@ export function ResearchWorkspace({
         if (!res.ok) {
           const errorJson = await res.json().catch(() => null);
           throw new Error(
-            errorJson?.error || `Server responded with HTTP ${res.status}`
+            errorJson?.error || `Máy chủ phản hồi với mã lỗi HTTP ${res.status}`
           );
         }
 
         if (!res.body) {
-          throw new Error('Streaming response body is unavailable.');
+          throw new Error('Đường truyền luồng dữ liệu không khả dụng.');
         }
 
         setChatStatus('streaming');
@@ -164,10 +164,10 @@ export function ResearchWorkspace({
                   returnedConvId = parsed.conversationId;
                 }
               } else if (parsed.type === 'error') {
-                throw new Error(parsed.error || 'Stream synthesis interrupted.');
+                throw new Error(parsed.error || 'Quá trình tổng hợp câu trả lời bị ngắt quãng.');
               }
             } catch (parseErr) {
-              if (parseErr instanceof Error && parseErr.message.includes('Stream synthesis')) {
+              if (parseErr instanceof Error && parseErr.message.includes('tổng hợp câu trả lời')) {
                 throw parseErr;
               }
               accumulatedText += line;
@@ -176,12 +176,12 @@ export function ResearchWorkspace({
           }
         }
 
-        // Finalize assistant message with structured cards
+        // Hoàn tất tin nhắn của trợ lý với các thẻ có cấu trúc
         const assistantMsg: MessageItemType = {
           id: `asst-${Date.now()}`,
           conversationId: returnedConvId,
           role: 'assistant',
-          content: structuredResult?.summary || accumulatedText || 'Synthesis complete.',
+          content: structuredResult?.summary || accumulatedText || 'Đã hoàn thành tổng hợp.',
           structuredResponse: structuredResult,
           createdAt: new Date().toISOString(),
         };
@@ -190,17 +190,17 @@ export function ResearchWorkspace({
         setStreamingContent('');
         setChatStatus('success');
 
-        // Update URL state without page reload
+        // Cập nhật URL mà không reload trang
         if (returnedConvId && window.location.pathname !== `/research/${returnedConvId}`) {
           window.history.pushState(null, '', `/research/${returnedConvId}`);
         }
       } catch (err) {
-        console.error('Chat streaming failure:', err);
+        console.error('Lỗi truyền dữ liệu chat:', err);
         setChatStatus('error');
         setErrorMessage(
           err instanceof Error
             ? err.message
-            : 'Unable to communicate with AI research assistant.'
+            : 'Không thể kết nối với trợ lý nghiên cứu AI.'
         );
         setStreamingContent('');
       }
@@ -208,7 +208,7 @@ export function ResearchWorkspace({
     [chatStatus, conversationId, selectedDocIds]
   );
 
-  // 3. Handle initial query param `?q=` if provided
+  // 3. Xử lý tham số câu hỏi ban đầu nếu có trên URL `?q=`
   useEffect(() => {
     if (
       initialQuery &&
@@ -221,14 +221,14 @@ export function ResearchWorkspace({
     }
   }, [initialQuery, documents, selectedDocIds, handleSendMessage]);
 
-  // 4. Regenerate last answer
+  // 4. Tạo lại câu trả lời gần nhất
   const handleRegenerateLast = () => {
     const userMessages = messages.filter((m) => m.role === 'user');
     if (userMessages.length === 0) return;
 
     const lastUserMsg = userMessages[userMessages.length - 1];
 
-    // Remove last assistant message
+    // Xóa câu trả lời gần nhất của AI
     setMessages((prev) => {
       if (prev.length > 0 && prev[prev.length - 1].role === 'assistant') {
         return prev.slice(0, -1);
@@ -239,7 +239,7 @@ export function ResearchWorkspace({
     handleSendMessage(lastUserMsg.content);
   };
 
-  // 5. Retry on error
+  // 5. Thử lại khi gặp lỗi
   const handleRetry = () => {
     const userMessages = messages.filter((m) => m.role === 'user');
     if (userMessages.length > 0) {
@@ -248,7 +248,7 @@ export function ResearchWorkspace({
     }
   };
 
-  // 6. Create new research session without refreshing page
+  // 6. Bắt đầu phiên nghiên cứu mới mà không tải lại trang
   const handleNewResearch = () => {
     setMessages([]);
     setStreamingContent('');
@@ -259,7 +259,7 @@ export function ResearchWorkspace({
     window.history.pushState(null, '', '/research');
   };
 
-  // 7. Context Selection Handlers
+  // 7. Xử lý chọn/bỏ chọn tài liệu ngữ cảnh
   const toggleSelectDoc = (id: string) => {
     setSelectedDocIds((prev) =>
       prev.includes(id) ? prev.filter((dId) => dId !== id) : [...prev, id]
@@ -292,15 +292,15 @@ export function ResearchWorkspace({
   return (
     <AppShell>
       <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Workspace Top Header Bar */}
+        {/* Thanh tiêu đề trên cùng của Không gian Nghiên cứu */}
         <div className="px-4 sm:px-6 py-3 border-b border-border bg-surface/85 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setIsRailOpen((prev) => !prev)}
               className="p-1.5 rounded-lg border border-border bg-surface hover:bg-muted text-muted-foreground hover:text-foreground transition-colors hidden md:flex items-center justify-center cursor-pointer shadow-2xs"
-              title={isRailOpen ? 'Hide context panel' : 'Show context panel'}
-              aria-label={isRailOpen ? 'Hide context panel' : 'Show context panel'}
+              title={isRailOpen ? 'Ẩn bảng ngữ cảnh' : 'Hiện bảng ngữ cảnh'}
+              aria-label={isRailOpen ? 'Ẩn bảng ngữ cảnh' : 'Hiện bảng ngữ cảnh'}
             >
               {isRailOpen ? (
                 <PanelLeftClose className="w-4 h-4" />
@@ -313,25 +313,25 @@ export function ResearchWorkspace({
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <h1 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-                  Research Workspace
+                  Không gian Nghiên cứu
                 </h1>
               </div>
               <p className="text-xs text-muted-foreground hidden sm:block">
-                Multi-document grounded inquiry &amp; AI synthesis
+                Vấn đáp và tổng hợp thông minh bám sát đa tài liệu
               </p>
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Các nút hành động */}
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleNewResearch}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface hover:bg-muted text-xs font-semibold text-foreground transition-all cursor-pointer shadow-2xs active:scale-95"
-              title="Start a new research conversation"
+              title="Bắt đầu phiên nghiên cứu mới"
             >
               <Plus className="w-3.5 h-3.5 text-primary" />
-              <span>New Research</span>
+              <span>Nghiên cứu mới</span>
             </button>
 
             <button
@@ -340,22 +340,22 @@ export function ResearchWorkspace({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all cursor-pointer shadow-2xs active:scale-95"
             >
               <Upload className="w-3.5 h-3.5" />
-              <span>Upload Document</span>
+              <span>Tải tài liệu lên</span>
             </button>
           </div>
         </div>
 
-        {/* Main Content: Split View between Context Rail & Chat Area */}
+        {/* Nội dung chính: Chia cột giữa Bảng chọn tài liệu và Khung Chat */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-          {/* Documents Selection Rail */}
+          {/* Bảng chọn tài liệu ngữ cảnh */}
           {isRailOpen && (
             <aside className="w-full md:w-80 border-b md:border-b-0 md:border-r border-border bg-surface/50 flex flex-col shrink-0 max-h-48 md:max-h-full transition-all">
-              {/* Rail Header */}
+              {/* Tiêu đề bảng tài liệu */}
               <div className="p-3 sm:p-4 border-b border-border/60 flex items-center justify-between bg-surface/80">
                 <div className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-primary" />
                   <span className="text-xs font-semibold text-foreground">
-                    Context Documents ({selectedDocIds.length}/{documents.length})
+                    Tài liệu ngữ cảnh ({selectedDocIds.length}/{documents.length})
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
@@ -364,7 +364,7 @@ export function ResearchWorkspace({
                     onClick={handleSelectAll}
                     className="text-primary hover:underline font-medium cursor-pointer"
                   >
-                    All
+                    Tất cả
                   </button>
                   <span className="text-muted-foreground/40">•</span>
                   <button
@@ -372,26 +372,26 @@ export function ResearchWorkspace({
                     onClick={handleDeselectAll}
                     className="text-muted-foreground hover:text-foreground font-medium cursor-pointer"
                   >
-                    None
+                    Bỏ chọn
                   </button>
                 </div>
               </div>
 
-              {/* Document Checklist */}
+              {/* Danh sách chọn tài liệu */}
               <div className="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2">
                 {documents.length === 0 ? (
                   <div className="p-4 rounded-xl border border-dashed border-border text-center">
                     <FileText className="w-6 h-6 text-muted-foreground mx-auto mb-1.5" />
-                    <p className="text-xs font-medium text-foreground">No documents yet</p>
+                    <p className="text-xs font-medium text-foreground">Chưa có tài liệu nào</p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
-                      Upload documents to ground your questions
+                      Tải tài liệu lên để đặt câu hỏi đối chiếu
                     </p>
                     <button
                       type="button"
                       onClick={() => setIsUploadOpen(true)}
                       className="inline-flex items-center gap-1 text-xs text-primary font-semibold hover:underline cursor-pointer"
                     >
-                      Upload Now <ArrowRight className="w-3 h-3" />
+                      Tải lên ngay <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 ) : (
@@ -410,7 +410,7 @@ export function ResearchWorkspace({
                       >
                         <button
                           type="button"
-                          aria-label={`Toggle ${doc.name}`}
+                          aria-label={`Chọn ${doc.name}`}
                           className="mt-0.5 text-primary shrink-0 cursor-pointer"
                         >
                           {isSelected ? (
@@ -444,22 +444,22 @@ export function ResearchWorkspace({
                 )}
               </div>
 
-              {/* Selection Status Footer */}
+              {/* Chân bảng: Thông báo trạng thái chọn */}
               <div className="p-2.5 sm:p-3 border-t border-border/60 bg-surface/60 text-[11px] text-muted-foreground">
                 {selectedDocIds.length > 0 ? (
                   <span className="text-primary font-medium">
-                    ✓ {selectedDocIds.length} document{selectedDocIds.length > 1 ? 's' : ''} in context
+                    ✓ {selectedDocIds.length} tài liệu trong ngữ cảnh
                   </span>
                 ) : (
                   <span className="text-amber-600 dark:text-amber-400">
-                    ⚠ Select at least one document to start
+                    ⚠ Chọn ít nhất một tài liệu để bắt đầu
                   </span>
                 )}
               </div>
             </aside>
           )}
 
-          {/* Main Chat Area */}
+          {/* Khung chat chính */}
           <main className="flex-1 flex flex-col h-full overflow-hidden bg-surface relative">
             <ChatBox
               messages={messages}
@@ -478,7 +478,7 @@ export function ResearchWorkspace({
         </div>
       </div>
 
-      {/* Upload Dialog Modal */}
+      {/* Hộp thoại tải tài liệu lên */}
       {isUploadOpen && (
         <UploadDialog
           isOpen={isUploadOpen}

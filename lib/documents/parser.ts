@@ -145,7 +145,7 @@ export async function parseDocument(
   } catch (error) {
     console.error(`Error parsing document ${fileName}:`, error);
     throw new Error(
-      `Failed to parse ${fileName}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Không thể phân tích tài liệu ${fileName}: ${error instanceof Error ? error.message : 'Lỗi không xác định'}`
     );
   }
 }

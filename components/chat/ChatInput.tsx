@@ -19,12 +19,12 @@ export function ChatInput({
   onSubmit,
   isLoading,
   disabled = false,
-  placeholder = 'Ask anything about your documents...',
+  placeholder = 'Đặt câu hỏi về tài liệu của bạn...',
   selectedCount = 0,
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea
+  // Tự động co giãn chiều cao textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -63,15 +63,15 @@ export function ChatInput({
             {selectedCount > 0 ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium text-[11px]">
                 <Paperclip className="w-3 h-3" />
-                {selectedCount} document{selectedCount > 1 ? 's' : ''} in context
+                {selectedCount} tài liệu trong ngữ cảnh
               </span>
             ) : (
               <span className="text-amber-600 dark:text-amber-400 text-[11px]">
-                No document selected
+                Chưa chọn tài liệu nào
               </span>
             )}
             <span className="hidden sm:inline text-[11px] text-muted-foreground/70">
-              Press Enter to send, Shift+Enter for newline
+              Nhấn Enter để gửi, Shift+Enter để xuống dòng
             </span>
           </div>
 
@@ -84,7 +84,8 @@ export function ChatInput({
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm active:scale-95 cursor-pointer'
                 : 'bg-muted text-muted-foreground/50 cursor-not-allowed'
             }`}
-            title="Send query"
+            title="Gửi câu hỏi"
+            aria-label="Gửi câu hỏi"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

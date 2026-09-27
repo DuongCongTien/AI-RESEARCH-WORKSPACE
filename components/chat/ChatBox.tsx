@@ -89,7 +89,7 @@ export function ChatBox({
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-transparent w-full">
-      {/* Messages Scroll Area */}
+      {/* Vùng cuộn tin nhắn */}
       <div className="flex-1 overflow-y-auto px-3 sm:px-6 md:px-8 py-4 sm:py-6">
         {messages.length === 0 && !streamingContent && status === 'idle' ? (
           <EmptyChat
@@ -114,7 +114,7 @@ export function ChatBox({
               );
             })}
 
-            {/* Real-time Streaming Response Display */}
+            {/* Trạng thái AI đang stream theo thời gian thực */}
             {status === 'streaming' && (
               <div className="flex w-full gap-3 sm:gap-4 py-3 justify-start animate-fade-in-up">
                 <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mt-1 shadow-2xs">
@@ -122,7 +122,7 @@ export function ChatBox({
                 </div>
                 <div className="flex flex-col items-start w-full max-w-full">
                   <div className="flex items-center gap-2 mb-2 px-1 text-xs text-muted-foreground font-mono">
-                    <span className="font-semibold text-primary">Streaming Synthesis</span>
+                    <span className="font-semibold text-primary">Đang tổng hợp theo thời gian thực</span>
                     <span>•</span>
                     <div className="flex items-center gap-1 h-3.5">
                       <span className="w-1 h-2 bg-primary rounded-full animate-bounce"></span>
@@ -130,11 +130,11 @@ export function ChatBox({
                       <span className="w-1 h-2 bg-primary rounded-full animate-bounce delay-150"></span>
                     </div>
                     <span>•</span>
-                    <span className="text-muted-foreground">Real-time token pipeline</span>
+                    <span className="text-muted-foreground">Kênh truyền mã thời gian thực</span>
                   </div>
                   <div className="w-full rounded-2xl rounded-tl-xs border border-border bg-surface p-4 sm:p-5 shadow-xs space-y-2">
                     <p className="text-sm leading-relaxed text-foreground whitespace-pre-line font-mono">
-                      {streamingContent || 'Synthesizing grounded analysis from indexed corpus...'}
+                      {streamingContent || 'Đang tổng hợp phân tích bám sát dữ liệu từ kho tài liệu...'}
                       <span className="inline-block w-2 h-4 ml-1.5 bg-primary rounded-xs animate-pulse align-middle"></span>
                     </p>
                   </div>
@@ -142,7 +142,7 @@ export function ChatBox({
               </div>
             )}
 
-            {/* Loading State Spinner */}
+            {/* Trạng thái đang tải */}
             {status === 'loading' && (
               <div className="flex items-center gap-3 py-4 text-xs text-muted-foreground animate-fade-in-up">
                 <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shadow-2xs">
@@ -150,31 +150,32 @@ export function ChatBox({
                 </div>
                 <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 shadow-2xs">
                   <span className="font-medium text-foreground">
-                    Analyzing document context and verifying grounded citations...
+                    Đang phân tích ngữ cảnh tài liệu và kiểm chứng các trích dẫn...
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Error State Card with Retry */}
+            {/* Thẻ hiển thị lỗi kèm nút Thử lại */}
             {status === 'error' && (
               <div className="mx-auto max-w-md my-6 p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 text-center flex flex-col items-center gap-2 animate-fade-in-up shadow-sm">
                 <div className="p-2.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <h4 className="font-bold text-base text-rose-700 dark:text-rose-400">
-                  Something went wrong.
+                  Đã xảy ra lỗi.
                 </h4>
                 <p className="text-xs text-rose-900/80 dark:text-rose-300 max-w-sm leading-relaxed">
-                  {errorMessage || "We couldn't generate a response right now. Please check your network or try again."}
+                  {errorMessage || 'Không thể tạo câu trả lời vào lúc này. Vui lòng kiểm tra kết nối mạng hoặc thử lại.'}
                 </p>
                 <button
                   type="button"
                   onClick={handleRetryAction}
                   className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-all shadow-xs active:scale-95 cursor-pointer"
+                  title="Thử lại yêu cầu"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
-                  <span>Retry</span>
+                  <span>Thử lại</span>
                 </button>
               </div>
             )}
@@ -184,14 +185,14 @@ export function ChatBox({
         )}
       </div>
 
-      {/* Sticky Bottom Input Bar */}
+      {/* Thanh nhập tin nhắn cố định ở đáy */}
       <div className="border-t border-border bg-surface/85 backdrop-blur-xl px-3 sm:px-6 md:px-8 py-3 shadow-xs shrink-0">
         <div className="mx-auto max-w-4xl">
-          {/* Active Context Documents Badges */}
+          {/* Nhãn tài liệu đang được chọn làm ngữ cảnh */}
           {selectedDocs.length > 0 && (
             <div className="mb-2 flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] font-semibold text-muted-foreground mr-1">
-                Active Context:
+                Ngữ cảnh hoạt động:
               </span>
               {selectedDocs.map((doc) => (
                 <div
@@ -206,8 +207,8 @@ export function ChatBox({
                       type="button"
                       onClick={() => onRemoveSelectedDoc(doc.id)}
                       className="ml-0.5 text-muted-foreground hover:text-rose-600 transition-colors cursor-pointer"
-                      title={`Remove ${doc.name} from context`}
-                      aria-label={`Remove ${doc.name}`}
+                      title={`Bỏ chọn ${doc.name} khỏi ngữ cảnh`}
+                      aria-label={`Bỏ chọn ${doc.name}`}
                     >
                       &times;
                     </button>
@@ -217,7 +218,7 @@ export function ChatBox({
             </div>
           )}
 
-          {/* Input Box Form */}
+          {/* Biểu mẫu nhập liệu */}
           <form
             onSubmit={handleSubmit}
             className="relative flex items-end gap-2 rounded-2xl border border-border bg-surface p-2 shadow-xs transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10"
@@ -229,7 +230,7 @@ export function ChatBox({
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               disabled={status === 'loading' || status === 'streaming'}
-              placeholder="Ask a scientific research question, request synthesis, or formulate hypotheses..."
+              placeholder="Đặt câu hỏi nghiên cứu, yêu cầu tổng hợp hoặc phân tích giả thuyết..."
               className="max-h-40 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
             />
 
@@ -237,8 +238,8 @@ export function ChatBox({
               type="submit"
               disabled={!inputValue.trim() || status === 'loading' || status === 'streaming'}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs transition-all hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-              title="Send inquiry (Enter)"
-              aria-label="Send message"
+              title="Gửi câu hỏi (Enter)"
+              aria-label="Gửi câu hỏi"
             >
               {status === 'loading' || status === 'streaming' ? (
                 <RotateCw className="w-4 h-4 animate-spin" />
@@ -249,7 +250,7 @@ export function ChatBox({
           </form>
 
           <p className="mt-2 text-center text-[11px] text-muted-foreground font-mono">
-            ResearchAI Studio Core • Multi-Document Grounded Synthesis
+            Không gian Nghiên cứu AI • Tổng hợp bám sát đa tài liệu
           </p>
         </div>
       </div>
@@ -257,5 +258,5 @@ export function ChatBox({
   );
 }
 
-// Re-export as ChatWindow for backwards compatibility
+// Export ChatWindow để tương thích ngược
 export { ChatBox as ChatWindow };

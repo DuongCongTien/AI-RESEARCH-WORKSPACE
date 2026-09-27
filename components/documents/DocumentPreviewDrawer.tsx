@@ -19,12 +19,12 @@ export function DocumentPreviewDrawer({
   if (!isOpen || !doc) return null;
 
   const handleExport = () => {
-    const content = doc.parsedMarkdown || doc.textContent || `# ${doc.name}\n\nNo extracted markdown content.`;
+    const content = doc.parsedMarkdown || doc.textContent || `# ${doc.name}\n\nKhông có nội dung văn bản Markdown được trích xuất.`;
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${doc.name.replace(/\.[^/.]+$/, '')}_extracted.md`;
+    a.download = `${doc.name.replace(/\.[^/.]+$/, '')}_trich_xuat.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -40,10 +40,10 @@ export function DocumentPreviewDrawer({
             </div>
             <div className="min-w-0">
               <span className="font-headline-sm text-headline-sm text-on-surface truncate block font-semibold">
-                Preview: {doc.name}
+                Xem trước: {doc.name}
               </span>
               <span className="font-label-xs text-label-xs text-outline block">
-                Indexed Vector Representation
+                Dữ liệu chỉ mục véc-tơ
               </span>
             </div>
           </div>
@@ -51,7 +51,7 @@ export function DocumentPreviewDrawer({
             type="button"
             onClick={onClose}
             className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high p-1.5 rounded-lg transition-colors cursor-pointer"
-            title="Close Preview Drawer"
+            title="Đóng ngăn xem trước"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -68,7 +68,7 @@ export function DocumentPreviewDrawer({
                 : 'text-on-surface-variant hover:text-on-surface border-transparent'
             }`}
           >
-            Parsed Markdown
+            Văn bản Markdown
           </button>
           <button
             type="button"
@@ -79,7 +79,7 @@ export function DocumentPreviewDrawer({
                 : 'text-on-surface-variant hover:text-on-surface border-transparent'
             }`}
           >
-            Raw Text
+            Văn bản thô
           </button>
           <button
             type="button"
@@ -90,7 +90,7 @@ export function DocumentPreviewDrawer({
                 : 'text-on-surface-variant hover:text-on-surface border-transparent'
             }`}
           >
-            Tables ({doc.tablesCount || 4})
+            Bảng biểu ({doc.tablesCount || 4})
           </button>
           <button
             type="button"
@@ -101,7 +101,7 @@ export function DocumentPreviewDrawer({
                 : 'text-on-surface-variant hover:text-on-surface border-transparent'
             }`}
           >
-            Vector Chunks ({doc.chunksCount || 15})
+            Đoạn trích ({doc.chunksCount || 15})
           </button>
         </div>
 
@@ -110,46 +110,44 @@ export function DocumentPreviewDrawer({
           {activeTab === 'markdown' && (
             <>
               <div className="p-space-sm rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/40 shadow-2xs">
-                <span className="font-label-xs text-label-xs text-outline font-mono">Chunk ID: #chk-0914-sec-1</span>
+                <span className="font-label-xs text-label-xs text-outline font-mono">Mã đoạn trích: #chk-0914-sec-1</span>
                 <span className="font-label-xs text-label-xs text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full font-mono font-semibold">
-                  Relevance 0.94
+                  Độ phù hợp 0.94
                 </span>
               </div>
 
               <div className="space-y-space-sm text-on-surface bg-surface p-4 rounded-xl border border-outline-variant/40 shadow-xs">
                 <h4 className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">
-                  1. Executive Summary &amp; Q4 Milestones
+                  1. Tóm tắt nội dung &amp; Điểm mốc chính
                 </h4>
                 <p className="leading-relaxed text-on-surface-variant">
-                  In fiscal year 2024, our deep learning infrastructure operations expanded by{' '}
+                  Trong tài liệu nghiên cứu, hạ tầng học sâu được tối ưu hóa tăng trưởng{' '}
                   <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold border border-primary/20">
-                    34.2% Year-Over-Year
+                    34.2% so với cùng kỳ
                   </span>
-                  . Core research clusters realized an overall inference throughput enhancement of 2.1x following the roll-out
-                  of speculative decoding kernels.
+                  . Các cụm tính toán đạt hiệu năng tăng 2.1 lần sau khi áp dụng các giải thuật suy luận nâng cao.
                 </p>
                 <p className="leading-relaxed text-on-surface-variant">
-                  Agent autonomy benchmark{' '}
+                  Thước đo tự chủ tác nhân{' '}
                   <span className="bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-semibold border border-tertiary/20">
                     GAIA-v2
                   </span>{' '}
-                  recorded an accuracy increase from 61.8% to 74.3% across tool retrieval tasks, corroborating hypotheses presented in
-                  Technical Memorandum #88.
+                  ghi nhận độ chính xác tăng từ 61.8% lên 74.3% trên các tác vụ truy hồi công cụ.
                 </p>
               </div>
 
               {/* Highlighted Table Preview */}
               <div className="rounded-xl overflow-hidden bg-surface border border-outline-variant/40 shadow-xs">
                 <div className="p-2.5 font-label-xs text-label-xs font-semibold bg-surface-container-low text-on-surface flex justify-between border-b border-outline-variant/30">
-                  <span>Table 1.1: Latency &amp; Memory Allocation</span>
-                  <span className="text-tertiary font-mono font-medium">Extracted Clean</span>
+                  <span>Bảng 1.1: Độ trễ &amp; Phân bổ bộ nhớ</span>
+                  <span className="text-tertiary font-mono font-medium">Trích xuất sạch</span>
                 </div>
                 <table className="w-full text-left font-label-xs text-label-xs">
                   <thead className="bg-surface-container-low/50 text-outline">
                     <tr>
-                      <th className="p-2.5 font-medium">Model Spec</th>
-                      <th className="p-2.5 font-medium">VRAM</th>
-                      <th className="p-2.5 font-medium">TTFT</th>
+                      <th className="p-2.5 font-medium">Mô hình</th>
+                      <th className="p-2.5 font-medium">Bộ nhớ</th>
+                      <th className="p-2.5 font-medium">Độ trễ</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/20 text-on-surface-variant">
@@ -169,17 +167,17 @@ export function DocumentPreviewDrawer({
 
               <div className="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1.5 border border-outline-variant/40 shadow-2xs">
                 <span className="font-label-xs text-label-xs text-outline uppercase tracking-wider font-semibold">
-                  Semantic Entity Tags
+                  Thực thể ngữ nghĩa
                 </span>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium border border-primary/20 hover:scale-105 transition-transform">
-                    #speculative-decoding
+                    #giai-ma-suy-luan
                   </span>
                   <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-medium border border-tertiary/20 hover:scale-105 transition-transform">
                     #gaia-benchmark
                   </span>
                   <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-secondary/10 text-secondary font-medium border border-secondary/20 hover:scale-105 transition-transform">
-                    #throughput
+                    #hieu-nang
                   </span>
                 </div>
               </div>
@@ -188,7 +186,7 @@ export function DocumentPreviewDrawer({
 
           {activeTab === 'raw' && (
             <div className="bg-surface-container-lowest p-3.5 rounded-xl font-mono text-xs text-on-surface-variant whitespace-pre-wrap leading-relaxed border border-outline-variant/40 shadow-inner">
-              {doc.textContent || doc.rawText || 'Raw text extracted from binary stream:\n\n[Header: 0x50 0x44 0x46]\n%PDF-1.7\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n...'}
+              {doc.textContent || doc.rawText || 'Văn bản thô trích xuất từ tệp tin:\n\n[Tiêu đề: 0x50 0x44 0x46]\n%PDF-1.7\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n...'}
             </div>
           )}
 
@@ -196,15 +194,15 @@ export function DocumentPreviewDrawer({
             <div className="space-y-space-md">
               <div className="rounded-xl overflow-hidden bg-surface border border-outline-variant/40 shadow-xs">
                 <div className="p-2.5 font-label-xs text-label-xs font-semibold bg-surface-container-low text-on-surface flex justify-between border-b border-outline-variant/30">
-                  <span>Table 1: Benchmark Accuracy Rates</span>
-                  <span className="text-tertiary font-mono font-medium">Extracted Clean</span>
+                  <span>Bảng 1: Tỷ lệ chính xác kiểm thử</span>
+                  <span className="text-tertiary font-mono font-medium">Trích xuất sạch</span>
                 </div>
                 <table className="w-full text-left font-label-xs text-label-xs">
                   <thead className="bg-surface-container-low/50 text-outline">
                     <tr>
-                      <th className="p-2.5">Benchmark</th>
-                      <th className="p-2.5">Baseline</th>
-                      <th className="p-2.5">With RAG</th>
+                      <th className="p-2.5">Bài kiểm thử</th>
+                      <th className="p-2.5">Cơ sở ban đầu</th>
+                      <th className="p-2.5">Kết hợp RAG</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/20 text-on-surface-variant">
@@ -234,11 +232,11 @@ export function DocumentPreviewDrawer({
                   <div className="flex items-center justify-between text-label-xs font-label-xs">
                     <span className="text-primary font-mono font-semibold">#chk-0914-sec-{chunkIdx}</span>
                     <span className="text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full font-mono font-medium">
-                      Relevance {(0.95 - chunkIdx * 0.04).toFixed(2)}
+                      Độ phù hợp {(0.95 - chunkIdx * 0.04).toFixed(2)}
                     </span>
                   </div>
                   <p className="text-body-sm text-on-surface-variant text-xs line-clamp-3 leading-relaxed">
-                    Section {chunkIdx}: Architectural scaling considerations for multi-token retrieval and speculative verification kernels...
+                    Phần {chunkIdx}: Các cân nhắc kiến trúc mở rộng khi truy xuất tài liệu và xác thực đa tác nhân nghiên cứu...
                   </p>
                 </div>
               ))}
@@ -256,7 +254,7 @@ export function DocumentPreviewDrawer({
             <span className="material-symbols-outlined text-[18px] text-primary group-hover:translate-y-0.5 transition-transform">
               file_download
             </span>
-            Export Extracted Markdown
+            Xuất văn bản Markdown
           </button>
         </div>
       </div>

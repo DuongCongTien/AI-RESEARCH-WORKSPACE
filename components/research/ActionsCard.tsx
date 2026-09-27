@@ -13,26 +13,26 @@ export function ActionsCard({ actions = [] }: ActionsCardProps) {
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-5 shadow-xs transition-all duration-200 hover:shadow-md hover:border-border/80">
-      {/* Header */}
+      {/* Tiêu đề */}
       <div className="flex items-center gap-2.5 pb-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
           <ListTodo className="w-4 h-4" />
         </div>
         <h4 className="font-semibold text-sm sm:text-base tracking-tight text-foreground">
-          Recommended Actions
+          Khuyến nghị hành động
         </h4>
         {validActions.length > 0 && (
           <span className="text-xs text-muted-foreground ml-auto font-mono">
-            {validActions.length} step{validActions.length > 1 ? 's' : ''}
+            {validActions.length} bước
           </span>
         )}
       </div>
 
-      {/* List or Empty State */}
+      {/* Danh sách hành động hoặc Trạng thái trống */}
       {validActions.length === 0 ? (
         <div className="flex items-center gap-2 rounded-xl border border-dashed border-border/70 bg-muted/30 p-3.5 text-xs text-muted-foreground">
           <CheckSquare className="w-4 h-4 text-muted-foreground/60 shrink-0" />
-          <span>No specific actions recommended for this context.</span>
+          <span>Không có khuyến nghị hành động cụ thể nào cho ngữ cảnh này.</span>
         </div>
       ) : (
         <div className="space-y-3">

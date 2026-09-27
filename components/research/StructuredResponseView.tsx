@@ -19,10 +19,12 @@ export function StructuredResponseView({ response }: StructuredResponseViewProps
   const keyPointsList = response.keyPoints || response.key_points || [];
 
   const handleExportJSON = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(response, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(response, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `research-report-${Date.now()}.json`);
+    downloadAnchor.setAttribute('download', `bao-cao-nghien-cuu-${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -32,57 +34,57 @@ export function StructuredResponseView({ response }: StructuredResponseViewProps
 
   return (
     <div className="space-y-4 my-2">
-      {/* Action and Filter Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/30 pb-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto rounded-lg bg-surface-container p-1 text-xs">
+      {/* Thanh công cụ và bộ lọc tab */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto rounded-lg bg-muted/50 p-1 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-surface-container-high text-primary shadow-xs'
-                : 'text-on-surface-variant hover:text-on-surface'
+                ? 'bg-surface text-primary shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <span className="material-symbols-outlined text-[16px]">grid_view</span>
-            <span>Full Report</span>
+            <span>Báo cáo đầy đủ</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('insights')}
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all cursor-pointer ${
               activeTab === 'insights'
-                ? 'bg-surface-container-high text-tertiary shadow-xs'
-                : 'text-on-surface-variant hover:text-on-surface'
+                ? 'bg-surface text-tertiary shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <span className="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
-            <span>Insights ({keyPointsList.length})</span>
+            <span>Điểm chính ({keyPointsList.length})</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('risks')}
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all cursor-pointer ${
               activeTab === 'risks'
-                ? 'bg-surface-container-high text-error shadow-xs'
-                : 'text-on-surface-variant hover:text-on-surface'
+                ? 'bg-surface text-rose-600 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px] text-error">warning</span>
-            <span>Risks & Actions</span>
+            <span className="material-symbols-outlined text-[16px] text-rose-600">warning</span>
+            <span>Rủi ro &amp; Hành động</span>
           </button>
           {response.sources && response.sources.length > 0 && (
             <button
               type="button"
               onClick={() => setActiveTab('sources')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all ${
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition-all cursor-pointer ${
                 activeTab === 'sources'
-                  ? 'bg-surface-container-high text-secondary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
+                  ? 'bg-surface text-secondary shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <span className="material-symbols-outlined text-[16px] text-secondary">menu_book</span>
-              <span>Citations ({response.sources.length})</span>
+              <span>Trích dẫn ({response.sources.length})</span>
             </button>
           )}
         </div>
@@ -90,17 +92,17 @@ export function StructuredResponseView({ response }: StructuredResponseViewProps
         <button
           type="button"
           onClick={handleExportJSON}
-          className="flex items-center gap-1.5 rounded-lg border border-outline-variant/30 bg-surface-container px-2.5 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-          title="Export structured report as JSON"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer shadow-2xs"
+          title="Xuất báo cáo dưới dạng tệp tin JSON"
         >
           <span className="material-symbols-outlined text-[15px] text-primary">
             {downloaded ? 'done' : 'file_download'}
           </span>
-          <span>{downloaded ? 'Exported' : 'Export JSON'}</span>
+          <span>{downloaded ? 'Đã xuất' : 'Xuất JSON'}</span>
         </button>
       </div>
 
-      {/* Structured Content Views */}
+      {/* Hiển thị các khối nội dung */}
       <div className="space-y-4">
         {(activeTab === 'all' || activeTab === 'insights') && (
           <>

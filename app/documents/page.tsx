@@ -14,7 +14,7 @@ import { DocumentItem } from '@/types';
 const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
   {
     id: 'doc-annual-report',
-    name: 'Annual_Report.pdf',
+    name: 'Bao_Cao_Thuong_Nien.pdf',
     fileType: 'pdf',
     fileSize: 2.4 * 1024 * 1024,
     pages: 15,
@@ -22,21 +22,21 @@ const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
     indexHealth: 98.4,
     status: 'ready',
     inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'today at 09:42 AM',
+    uploadedBy: 'TS. Elena Vance',
+    uploadedAt: 'hôm nay lúc 09:42',
     tablesCount: 4,
     chunksCount: 15,
     tokensCount: 42190,
     embeddingModel: 'text-embedding-3-large',
     textContent:
-      'In fiscal year 2024, our deep learning infrastructure operations expanded by 34.2% Year-Over-Year. Core research clusters realized an overall inference throughput enhancement of 2.1x following the roll-out of speculative decoding kernels.',
+      'Trong năm tài chính 2024, hoạt động hạ tầng học sâu mở rộng 34.2% so với cùng kỳ. Cụm nghiên cứu đạt thông lượng suy luận tăng 2.1x sau khi triển khai các bộ giải mã nâng cao.',
     parsedMarkdown:
-      '# 1. Executive Summary & Q4 Milestones\n\nIn fiscal year 2024, our deep learning infrastructure operations expanded by **34.2% Year-Over-Year**. Core research clusters realized an overall inference throughput enhancement of 2.1x following the roll-out of speculative decoding kernels.\n\nAgent autonomy benchmark **GAIA-v2** recorded an accuracy increase from 61.8% to 74.3% across tool retrieval tasks, corroborating hypotheses presented in Technical Memorandum #88.',
+      '# 1. Tóm tắt nội dung & Điểm mốc chính\n\nTrong năm tài chính 2024, hoạt động hạ tầng học sâu mở rộng **34.2% so với cùng kỳ**. Cụm nghiên cứu đạt thông lượng suy luận tăng 2.1x sau khi triển khai các bộ giải mã nâng cao.\n\nThước đo tự chủ tác nhân **GAIA-v2** ghi nhận độ chính xác tăng từ 61.8% lên 74.3% trên các tác vụ truy hồi công cụ.',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'doc-market-analysis',
-    name: 'Market_Analysis.docx',
+    name: 'Phan_Tich_Thi_Truong.docx',
     fileType: 'docx',
     fileSize: 1.8 * 1024 * 1024,
     pages: 28,
@@ -44,11 +44,11 @@ const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
     indexHealth: 88.0,
     status: 'processing',
     progress: 42,
-    step: 'Extracting text & multi-column tables... (Chunk 18/42)',
-    timeRemaining: 'Est. 20s',
+    step: 'Đang trích xuất văn bản & bảng biểu... (Đoạn 18/42)',
+    timeRemaining: 'Dự kiến 20 giây',
     inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: '4 mins ago',
+    uploadedBy: 'TS. Elena Vance',
+    uploadedAt: '4 phút trước',
     tablesCount: 2,
     chunksCount: 8,
     tokensCount: 14500,
@@ -57,7 +57,7 @@ const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
   },
   {
     id: 'doc-technical-notes',
-    name: 'Technical_Notes.txt',
+    name: 'Ghi_Chu_Ky_Thuat.txt',
     fileType: 'txt',
     fileSize: 420 * 1024,
     pages: 4,
@@ -66,26 +66,26 @@ const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
     status: 'uploading',
     progress: 65,
     transferRate: '1.2 MB/s',
-    timeRemaining: '~2 seconds remaining',
+    timeRemaining: 'Còn ~2 giây',
     inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'Uploading from local storage',
+    uploadedBy: 'TS. Elena Vance',
+    uploadedAt: 'Đang tải lên từ thiết bị',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'doc-corrupted-data',
-    name: 'Corrupted_Data.pdf',
+    name: 'Tep_Loi_Du_Lieu.pdf',
     fileType: 'pdf',
     fileSize: 512 * 1024,
     pages: 0,
     wordCount: 0,
     indexHealth: 0,
     status: 'failed',
-    errorMsg: 'Header parsing failed (invalid magic byte EOF)',
+    errorMsg: 'Phân tích tiêu đề thất bại (magic byte không hợp lệ)',
     errorCode: 'ERR_PDF_MAGIC_0x00',
     inContext: false,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'Ingestion terminated 14 mins ago',
+    uploadedBy: 'TS. Elena Vance',
+    uploadedAt: 'Quá trình nạp dừng 14 phút trước',
     createdAt: new Date().toISOString(),
   },
 ];
@@ -175,7 +175,7 @@ export default function DocumentsPage() {
 
   const handleRemoveSelected = async () => {
     if (selectedIds.length === 0) return;
-    const confirmDelete = window.confirm(`Remove ${selectedIds.length} selected document(s) from active corpus?`);
+    const confirmDelete = window.confirm(`Xóa ${selectedIds.length} tài liệu đã chọn khỏi không gian nghiên cứu?`);
     if (!confirmDelete) return;
 
     for (const id of selectedIds) {
@@ -214,10 +214,10 @@ export default function DocumentsPage() {
 
   const handleSyncVectorStore = async () => {
     setIsSyncing(true);
-    setSyncFeedback('Synchronizing embeddings with Pinecone / PostgreSQL pgvector...');
+    setSyncFeedback('Đang đồng bộ hóa dữ liệu nhúng với cơ sở dữ liệu véc-tơ...');
     setTimeout(() => {
       setIsSyncing(false);
-      setSyncFeedback('Vector store synchronized. 42,190 tokens refreshed.');
+      setSyncFeedback('Kho lưu trữ véc-tơ đã đồng bộ. 42,190 token đã làm mới.');
       setTimeout(() => setSyncFeedback(null), 4000);
     }, 1500);
   };
@@ -230,7 +230,7 @@ export default function DocumentsPage() {
             ...d,
             status: 'processing',
             progress: 15,
-            step: 'Re-initializing OCR and text tokenization...',
+            step: 'Đang khởi tạo lại OCR và mã hóa văn bản...',
             errorMsg: null,
             errorCode: null,
           };
@@ -250,7 +250,7 @@ export default function DocumentsPage() {
               pages: 12,
               wordCount: 8400,
               indexHealth: 96.5,
-              step: 'Completed',
+              step: 'Đã hoàn thành',
             };
           }
           return d;
@@ -261,7 +261,7 @@ export default function DocumentsPage() {
 
   const handleCancelTask = (id: string) => {
     setDocuments((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, status: 'failed', errorMsg: 'Cancelled by user.' } : d))
+      prev.map((d) => (d.id === id ? { ...d, status: 'failed', errorMsg: 'Bị hủy bởi người dùng.' } : d))
     );
   };
 
@@ -294,14 +294,14 @@ export default function DocumentsPage() {
               <div>
                 <div className="flex items-center gap-space-sm">
                   <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-                    Workspace Documents
+                    Tài liệu không gian làm việc
                   </h1>
                   <span className="font-label-xs text-label-xs px-2.5 py-0.5 rounded-full bg-surface-container-high text-tertiary border border-outline-variant/30">
-                    {documents.length} files uploaded
+                    {documents.length} tệp đã tải lên
                   </span>
                 </div>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                  Manage corpus indexing, toggle active context files for multi-agent synthesis, and inspect extraction health.
+                  Quản lý chỉ mục tài liệu, bật/tắt tệp ngữ cảnh cho mô hình AI và kiểm tra tình trạng trích xuất.
                 </p>
               </div>
 
@@ -316,7 +316,7 @@ export default function DocumentsPage() {
                   <span className={`material-symbols-outlined text-[16px] ${isSyncing ? 'animate-spin' : ''}`}>
                     sync
                   </span>
-                  {isSyncing ? 'Syncing...' : 'Sync Vector Store'}
+                  {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ hóa véc-tơ'}
                 </button>
                 <button
                   type="button"
@@ -324,7 +324,7 @@ export default function DocumentsPage() {
                   className="inline-flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-primary hover:bg-primary-fixed text-on-primary font-body-sm text-body-sm font-medium transition-all shadow-md"
                 >
                   <span className="material-symbols-outlined text-[16px]">cloud_upload</span>
-                  Add More Documents
+                  Tải thêm tài liệu
                 </button>
               </div>
             </div>
@@ -367,9 +367,9 @@ export default function DocumentsPage() {
             {filteredDocuments.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-center p-8 bg-surface-container-low rounded-2xl border border-outline-variant/20">
                 <span className="material-symbols-outlined text-[48px] text-outline mb-2">find_in_page</span>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">No documents found</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Không tìm thấy tài liệu</h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm mt-1">
-                  No documents match your filter criteria or search query. Try clearing filters or uploading new files.
+                  Không có tài liệu nào khớp với tiêu chí lọc hoặc tìm kiếm. Hãy thử xóa bộ lọc hoặc tải tệp mới lên.
                 </p>
                 <button
                   type="button"
@@ -380,7 +380,7 @@ export default function DocumentsPage() {
                   }}
                   className="mt-4 px-4 py-1.5 rounded-lg bg-surface-container-high text-primary text-xs hover:bg-surface-bright"
                 >
-                  Clear Filters
+                  Xóa bộ lọc
                 </button>
               </div>
             ) : (

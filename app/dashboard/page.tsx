@@ -47,7 +47,7 @@ export default function DashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: quickPrompt.trim() ? quickPrompt.slice(0, 40) : 'New Research Session',
+          title: quickPrompt.trim() ? quickPrompt.slice(0, 40) : 'Phiên nghiên cứu mới',
         }),
       });
       const json = await res.json();
@@ -79,13 +79,13 @@ export default function DashboardPage() {
           <div className="relative z-10 space-y-4 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-label-xs text-label-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-tertiary animate-status-ripple"></span>
-              <span>ResearchAI Studio Core • Stanford AI Lab</span>
+              <span>Hệ thống ResearchAI Studio • Phòng Thí nghiệm AI</span>
             </div>
             <h1 className="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">
-              Intelligent Multi-Agent Synthesis &amp; Corpus Workspace
+              Không Gian Nghiên Cứu &amp; Tổng Hợp Tri Thức Đa Tài Liệu
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-              Accelerate scientific discovery, automate literature reviews, and cross-reference structured risks, actions, and empirical findings grounded in your active documents.
+              Tăng tốc khám phá khoa học, tự động hóa tổng quan tài liệu và đối chiếu các rủi ro, khuyến nghị hành động chính xác dựa trên tài liệu nghiên cứu của bạn.
             </p>
 
             {/* Quick Inquiry Omnibar */}
@@ -99,7 +99,7 @@ export default function DashboardPage() {
                   value={quickPrompt}
                   onChange={(e) => setQuickPrompt(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleStartResearch()}
-                  placeholder="Ask a scientific question or enter research inquiry..."
+                  placeholder="Đặt câu hỏi nghiên cứu hoặc nhập nội dung cần phân tích..."
                   className="w-full bg-surface-container-low pl-11 pr-4 py-3 rounded-2xl text-on-surface font-body-sm text-body-sm border border-outline-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-xs transition-all placeholder:text-outline"
                 />
               </div>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
                 onClick={handleStartResearch}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-primary hover:bg-primary/95 text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-sm hover:shadow-lg hover:shadow-primary/20 shrink-0 cursor-pointer active:scale-95"
               >
-                <span>Synthesize</span>
+                <span>Tổng hợp</span>
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </button>
             </div>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-space-md">
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs hover:shadow-xl hover:shadow-primary/5 hover:border-primary/40 -translate-y-0 hover:-translate-y-1 transition-all duration-300 card-interactive flex flex-col justify-between group">
             <div className="flex items-center justify-between text-outline">
-              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Indexed Tokens</span>
+              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Token đã lập chỉ mục</span>
               <div className="w-9 h-9 rounded-xl bg-tertiary/10 text-tertiary flex items-center justify-center border border-tertiary/20 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[18px]">hub</span>
               </div>
@@ -136,7 +136,7 @@ export default function DashboardPage() {
 
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs hover:shadow-xl hover:shadow-primary/5 hover:border-primary/40 -translate-y-0 hover:-translate-y-1 transition-all duration-300 card-interactive flex flex-col justify-between group">
             <div className="flex items-center justify-between text-outline">
-              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Active Documents</span>
+              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Tài liệu hoạt động</span>
               <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[18px]">folder_open</span>
               </div>
@@ -146,14 +146,14 @@ export default function DashboardPage() {
                 {documents.length || 4}
               </span>
               <span className="font-label-xs text-label-xs text-primary block mt-0.5 font-semibold">
-                {readyDocs} Ready • Corpus Synced
+                {readyDocs} Sẵn sàng • Đã đồng bộ
               </span>
             </div>
           </div>
 
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs hover:shadow-xl hover:shadow-primary/5 hover:border-primary/40 -translate-y-0 hover:-translate-y-1 transition-all duration-300 card-interactive flex flex-col justify-between group">
             <div className="flex items-center justify-between text-outline">
-              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Storage Utilized</span>
+              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Dung lượng sử dụng</span>
               <div className="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center border border-secondary/20 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[18px]">database</span>
               </div>
@@ -163,14 +163,14 @@ export default function DashboardPage() {
                 {totalMB} MB
               </span>
               <span className="font-label-xs text-label-xs text-outline block mt-0.5 font-semibold">
-                Limit: 500 MB (Secure S3)
+                Giới hạn: 500 MB (Lưu trữ an toàn)
               </span>
             </div>
           </div>
 
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs hover:shadow-xl hover:shadow-primary/5 hover:border-primary/40 -translate-y-0 hover:-translate-y-1 transition-all duration-300 card-interactive flex flex-col justify-between group">
             <div className="flex items-center justify-between text-outline">
-              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Grounding Health</span>
+              <span className="font-label-xs text-label-xs uppercase tracking-wider font-bold">Độ chính xác dữ liệu gốc</span>
               <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[18px]">verified</span>
               </div>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                 98.4%
               </span>
               <span className="font-label-xs text-label-xs text-emerald-700 block mt-0.5 font-semibold">
-                GAIA-v2 Verified
+                Kiểm chứng đạt chuẩn GAIA-v2
               </span>
             </div>
           </div>
@@ -192,10 +192,10 @@ export default function DashboardPage() {
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs flex flex-col justify-between space-y-4">
             <div>
               <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold mb-1">
-                Workspace Actions
+                Tác vụ không gian làm việc
               </h3>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Direct entry points to manage files, prompt models, and check synthesis logs.
+                Lối tắt trực tiếp để quản lý tệp tin, truy vấn mô hình AI và xem nhật ký tổng hợp.
               </p>
             </div>
 
@@ -208,10 +208,10 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-[20px] text-tertiary">folder_open</span>
                   <div>
                     <span className="font-body-sm text-body-sm font-semibold text-on-surface block">
-                      Manage Workspace Documents
+                      Quản lý tài liệu nghiên cứu
                     </span>
                     <span className="font-label-xs text-label-xs text-outline">
-                      Inspect chunks, tables &amp; vectors
+                      Xem các đoạn trích, bảng biểu &amp; véc-tơ
                     </span>
                   </div>
                 </div>
@@ -228,10 +228,10 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-[20px] text-primary">psychology</span>
                   <div>
                     <span className="font-body-sm text-body-sm font-semibold text-on-surface block">
-                      Open Research Chat
+                      Mở hội thoại nghiên cứu
                     </span>
                     <span className="font-label-xs text-label-xs text-outline">
-                      Ask grounded multi-agent queries
+                      Đặt câu hỏi và tổng hợp tri thức chuyên sâu
                     </span>
                   </div>
                 </div>
@@ -248,10 +248,10 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-[20px] text-secondary">history</span>
                   <div>
                     <span className="font-body-sm text-body-sm font-semibold text-on-surface block">
-                      View Synthesis History
+                      Xem lịch sử nghiên cứu
                     </span>
                     <span className="font-label-xs text-label-xs text-outline">
-                      Browse prior research conversations
+                      Duyệt lại các phiên làm việc và kết quả
                     </span>
                   </div>
                 </div>
@@ -266,40 +266,43 @@ export default function DashboardPage() {
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                Corpus Highlights
+                Tài liệu nổi bật
               </h3>
               <Link href="/documents" className="font-label-xs text-label-xs text-primary font-semibold hover:underline">
-                View all ({documents.length || 4})
+                Xem tất cả ({documents.length || 4})
               </Link>
             </div>
 
             <div className="space-y-2">
               {(documents.length > 0 ? documents : [
-                { id: '1', name: 'Annual_Report.pdf', status: 'ready', fileSize: 2.4 * 1024 * 1024, pages: 15 },
-                { id: '2', name: 'Market_Analysis.docx', status: 'processing', fileSize: 1.8 * 1024 * 1024, pages: 28 },
-                { id: '3', name: 'Technical_Notes.txt', status: 'uploading', fileSize: 420 * 1024, pages: 4 },
-              ]).slice(0, 3).map((doc) => (
-                <Link
-                  key={doc.id}
-                  href={`/documents?selected=${doc.id}`}
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
-                >
-                  <div className="flex items-center gap-2.5 truncate pr-2">
-                    <span className="material-symbols-outlined text-[18px] text-tertiary">article</span>
-                    <div className="min-w-0">
-                      <span className="font-body-sm text-body-sm text-on-surface font-semibold block truncate">
-                        {doc.name}
-                      </span>
-                      <span className="font-label-xs text-label-xs text-outline block">
-                        {doc.pages || 10} pages • {doc.status}
-                      </span>
+                { id: '1', name: 'Bao_Cao_Thuong_Nien.pdf', status: 'ready', fileSize: 2.4 * 1024 * 1024, pages: 15 },
+                { id: '2', name: 'Phan_Tich_Thi_Truong.docx', status: 'processing', fileSize: 1.8 * 1024 * 1024, pages: 28 },
+                { id: '3', name: 'Ghi_Chu_Ky_Thuat.txt', status: 'uploading', fileSize: 420 * 1024, pages: 4 },
+              ]).slice(0, 3).map((doc) => {
+                const statusLabel = doc.status === 'ready' ? 'Sẵn sàng' : doc.status === 'processing' ? 'Đang xử lý' : doc.status === 'uploading' ? 'Đang tải lên' : 'Thất bại';
+                return (
+                  <Link
+                    key={doc.id}
+                    href={`/documents?selected=${doc.id}`}
+                    className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
+                  >
+                    <div className="flex items-center gap-2.5 truncate pr-2">
+                      <span className="material-symbols-outlined text-[18px] text-tertiary">article</span>
+                      <div className="min-w-0">
+                        <span className="font-body-sm text-body-sm text-on-surface font-semibold block truncate">
+                          {doc.name}
+                        </span>
+                        <span className="font-label-xs text-label-xs text-outline block">
+                          {doc.pages || 10} trang • {statusLabel}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold uppercase">
-                    {doc.status}
-                  </span>
-                </Link>
-              ))}
+                    <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold uppercase">
+                      {statusLabel}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -307,18 +310,18 @@ export default function DashboardPage() {
           <div className="p-space-lg rounded-2xl bg-surface border border-outline-variant/60 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                Recent Syntheses
+                Nghiên cứu gần đây
               </h3>
               <Link href="/history" className="font-label-xs text-label-xs text-primary font-semibold hover:underline">
-                History
+                Lịch sử
               </Link>
             </div>
 
             <div className="space-y-2">
               {(conversations.length > 0 ? conversations : [
-                { id: 'conv-1', title: 'Quantum Error Mitigation', updatedAt: '12m ago' },
-                { id: 'conv-2', title: 'Multi-agent consensus check', updatedAt: '2h ago' },
-                { id: 'conv-3', title: 'Latent Space Optimization', updatedAt: '1d ago' },
+                { id: 'conv-1', title: 'Giảm thiểu sai số lượng tử', updatedAt: '12 phút trước' },
+                { id: 'conv-2', title: 'Kiểm tra đồng thuận đa tác nhân', updatedAt: '2 giờ trước' },
+                { id: 'conv-3', title: 'Tối ưu hóa không gian tiềm ẩn', updatedAt: '1 ngày trước' },
               ]).slice(0, 3).map((conv) => (
                 <Link
                   key={conv.id}
@@ -332,7 +335,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
-                    {typeof conv.updatedAt === 'string' ? conv.updatedAt : 'Recent'}
+                    {typeof conv.updatedAt === 'string' ? conv.updatedAt : 'Gần đây'}
                   </span>
                 </Link>
               ))}

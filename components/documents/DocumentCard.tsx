@@ -59,19 +59,19 @@ export function DocumentCard({
                   </span>
                 </div>
                 <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                  Uploaded {doc.uploadedAt || 'today at 09:42 AM'} by {doc.uploadedBy || 'Dr. Elena Vance'}
+                  Được tải lên {doc.uploadedAt || 'hôm nay lúc 09:42'} bởi {doc.uploadedBy || 'TS. Elena Vance'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-space-xs shrink-0">
               <span className="inline-flex items-center gap-1.5 font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-tertiary-container dark:text-on-tertiary font-semibold">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-status-ripple"></span>
-                Ready
+                Sẵn sàng
               </span>
               <button
                 type="button"
                 className="p-1 text-outline hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors"
-                title="Options"
+                title="Tùy chọn"
               >
                 <span className="material-symbols-outlined text-[18px]">more_vert</span>
               </button>
@@ -81,21 +81,21 @@ export function DocumentCard({
           {/* Metrics Grid */}
           <div className="grid grid-cols-4 gap-space-xs py-space-md mt-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl px-space-sm text-center">
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">File Size</span>
+              <span className="font-label-xs text-label-xs text-outline block">Dung lượng</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">{fileSizeMB}</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Pages</span>
+              <span className="font-label-xs text-label-xs text-outline block">Số trang</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages || 15}</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Word Count</span>
+              <span className="font-label-xs text-label-xs text-outline block">Số từ</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">
                 {(doc.wordCount || 12450).toLocaleString()}
               </span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Index Health</span>
+              <span className="font-label-xs text-label-xs text-outline block">Độ tin cậy chỉ mục</span>
               <span className="font-label-md text-label-md text-tertiary font-semibold">
                 {doc.indexHealth || 98.4}%
               </span>
@@ -106,7 +106,7 @@ export function DocumentCard({
           <div className="flex items-center justify-between mt-space-md p-space-sm rounded-xl bg-surface-container-low border border-outline-variant/40">
             <div className="flex items-center gap-space-xs">
               <span className="material-symbols-outlined text-primary text-[18px] animate-subtle-pulse">psychology</span>
-              <span className="font-body-sm text-body-sm text-on-surface font-medium">Included in agent prompt context</span>
+              <span className="font-body-sm text-body-sm text-on-surface font-medium">Được đưa vào ngữ cảnh AI</span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -128,7 +128,7 @@ export function DocumentCard({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-primary hover:text-white text-on-surface font-body-sm text-body-sm transition-all duration-200 shadow-2xs active:scale-95 group/btn"
           >
             <span className="material-symbols-outlined text-[16px] text-tertiary group-hover/btn:text-white transition-colors">visibility</span>
-            Preview Text
+            Xem nội dung
           </button>
           <div className="flex items-center gap-space-xs">
             <button
@@ -136,14 +136,14 @@ export function DocumentCard({
               onClick={() => onInspectChunks ? onInspectChunks(doc) : onPreview(doc)}
               className="px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm border border-outline-variant/40 transition-all duration-200 active:scale-95"
             >
-              Inspect Chunks
+              Xem đoạn trích
             </button>
             {onDelete && (
               <button
                 type="button"
                 onClick={() => onDelete(doc.id)}
                 className="p-1.5 rounded-xl bg-surface-container-low hover:bg-rose-500/10 text-on-surface-variant hover:text-rose-600 border border-outline-variant/40 transition-colors active:scale-95 cursor-pointer"
-                title="Remove Document"
+                title="Xóa tài liệu"
               >
                 <span className="material-symbols-outlined text-[16px]">delete</span>
               </button>
@@ -180,14 +180,14 @@ export function DocumentCard({
                   </span>
                 </div>
                 <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                  Uploaded {doc.uploadedAt || '4 mins ago'} by {doc.uploadedBy || 'Dr. Elena Vance'}
+                  Được tải lên {doc.uploadedAt || '4 phút trước'} bởi {doc.uploadedBy || 'TS. Elena Vance'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-space-xs shrink-0">
               <span className="inline-flex items-center gap-1.5 font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
                 <span className="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>
-                Processing {progress}%
+                Đang xử lý {progress}%
               </span>
               <button
                 type="button"
@@ -202,9 +202,9 @@ export function DocumentCard({
           <div className="mt-space-md p-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl flex flex-col gap-1.5">
             <div className="flex items-center justify-between font-label-xs text-label-xs">
               <span className="text-on-surface font-semibold">
-                {doc.step || 'Extracting text & multi-column tables...'}
+                {doc.step || 'Đang trích xuất nội dung văn bản & bảng biểu...'}
               </span>
-              <span className="text-primary font-mono font-semibold">Step 2 of 4</span>
+              <span className="text-primary font-mono font-semibold">Bước 2 / 4</span>
             </div>
             <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
               <div
@@ -213,24 +213,24 @@ export function DocumentCard({
               ></div>
             </div>
             <div className="flex items-center justify-between font-label-xs text-label-xs text-outline pt-0.5">
-              <span>Vector pipeline: Cohere-Embed-v3</span>
-              <span>{doc.timeRemaining || 'Est. remaining: 24s'}</span>
+              <span>Đường ống véc-tơ: Cohere-Embed-v3</span>
+              <span>{doc.timeRemaining || 'Dự kiến còn: 24 giây'}</span>
             </div>
           </div>
 
           {/* Metrics Grid */}
           <div className="grid grid-cols-3 gap-space-xs py-space-sm mt-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl px-space-sm text-center">
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">File Size</span>
+              <span className="font-label-xs text-label-xs text-outline block">Dung lượng</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">{fileSizeMB}</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Estimated Pages</span>
+              <span className="font-label-xs text-label-xs text-outline block">Số trang ước tính</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages || 28}</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Embedding Status</span>
-              <span className="font-label-md text-label-md text-primary font-semibold">Pending</span>
+              <span className="font-label-xs text-label-xs text-outline block">Trạng thái nhúng</span>
+              <span className="font-label-md text-label-md text-primary font-semibold">Đang chờ</span>
             </div>
           </div>
 
@@ -238,7 +238,7 @@ export function DocumentCard({
           <div className="flex items-center justify-between mt-space-md p-space-sm rounded-xl bg-surface-container-low border border-outline-variant/40">
             <div className="flex items-center gap-space-xs">
               <span className="material-symbols-outlined text-outline text-[18px]">auto_awesome</span>
-              <span className="font-body-sm text-body-sm text-on-surface font-medium">Auto-include once processed</span>
+              <span className="font-body-sm text-body-sm text-on-surface font-medium">Tự động đưa vào khi xử lý xong</span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -260,14 +260,14 @@ export function DocumentCard({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-2xs active:scale-95"
           >
             <span className="material-symbols-outlined text-[16px] text-primary">terminal</span>
-            View Extraction Stream
+            Xem luồng trích xuất
           </button>
           <button
             type="button"
             onClick={() => onCancel && onCancel(doc.id)}
             className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-body-sm text-body-sm font-medium transition-all active:scale-95"
           >
-            Cancel Task
+            Hủy tác vụ
           </button>
         </div>
       </div>
@@ -300,14 +300,14 @@ export function DocumentCard({
                   </span>
                 </div>
                 <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                  Uploading from local storage
+                  Đang tải lên từ thiết bị
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-space-xs shrink-0">
               <span className="inline-flex items-center gap-1.5 font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-                Uploading {progress}%
+                Đang tải lên {progress}%
               </span>
               <button
                 type="button"
@@ -321,7 +321,7 @@ export function DocumentCard({
           {/* Upload progress visual */}
           <div className="mt-space-md p-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl flex flex-col gap-1.5">
             <div className="flex items-center justify-between font-label-xs text-label-xs">
-              <span className="text-on-surface font-semibold">273 KB of 420 KB transferred</span>
+              <span className="text-on-surface font-semibold">Đã chuyển 273 KB / 420 KB</span>
               <span className="text-secondary font-mono font-semibold">{doc.transferRate || '1.2 MB/s'}</span>
             </div>
             <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
@@ -331,23 +331,23 @@ export function DocumentCard({
               ></div>
             </div>
             <div className="flex items-center justify-between font-label-xs text-label-xs text-outline pt-0.5">
-              <span>Secure S3 Direct Pipe</span>
-              <span>~2 seconds remaining</span>
+              <span>Đường truyền trực tiếp bảo mật</span>
+              <span>Còn ~2 giây</span>
             </div>
           </div>
 
           {/* Metrics Grid */}
           <div className="grid grid-cols-3 gap-space-xs py-space-sm mt-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl px-space-sm text-center">
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Total Size</span>
+              <span className="font-label-xs text-label-xs text-outline block">Tổng dung lượng</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">{fileSizeMB}</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Equiv. Pages</span>
-              <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages || 4} Pages</span>
+              <span className="font-label-xs text-label-xs text-outline block">Số trang tương đương</span>
+              <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages || 4} Trang</span>
             </div>
             <div>
-              <span className="font-label-xs text-label-xs text-outline block">Est. Words</span>
+              <span className="font-label-xs text-label-xs text-outline block">Số từ ước tính</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">
                 {(doc.wordCount || 3120).toLocaleString()}
               </span>
@@ -362,14 +362,14 @@ export function DocumentCard({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-2xs active:scale-95"
           >
             <span className="material-symbols-outlined text-[16px]">pause</span>
-            Pause Upload
+            Tạm dừng
           </button>
           <button
             type="button"
             onClick={() => onPreview(doc)}
             className="px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm border border-outline-variant/40 transition-all active:scale-95"
           >
-            Preview Draft
+            Xem bản nháp
           </button>
         </div>
       </div>
@@ -396,18 +396,18 @@ export function DocumentCard({
               <div className="flex items-center gap-space-xs">
                 <h3 className="font-headline-sm text-headline-sm text-rose-600 truncate font-semibold">{doc.name}</h3>
                 <span className="font-label-xs text-label-xs px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-200 uppercase font-semibold">
-                  CORRUPTED
+                  LỖI TỆP
                 </span>
               </div>
               <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                Ingestion terminated {doc.uploadedAt || '14 mins ago'}
+                Quá trình nạp dừng {doc.uploadedAt || '14 phút trước'}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-space-xs shrink-0">
             <span className="inline-flex items-center gap-1.5 font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200 font-semibold">
               <span className="material-symbols-outlined text-[14px]">warning</span>
-              Failed
+              Thất bại
             </span>
             <button
               type="button"
@@ -422,21 +422,21 @@ export function DocumentCard({
         <div className="mt-space-md p-space-sm rounded-xl bg-rose-50/70 border border-rose-200 flex flex-col gap-1">
           <div className="flex items-center gap-space-xs text-rose-700 font-label-sm text-label-sm font-semibold">
             <span className="material-symbols-outlined text-[16px]">attribution</span>
-            {doc.errorMsg || 'Header parsing failed (invalid magic byte EOF)'}
+            {doc.errorMsg || 'Phân tích tiêu đề thất bại (magic byte không hợp lệ)'}
           </div>
           <p className="font-body-sm text-body-sm text-rose-900/80 leading-relaxed">
-            The parser encountered an unreadable cross-reference table. Please convert to PDF 1.7 or run through Ghostscript repair before re-submitting.
+            Bộ phân tích gặp cấu trúc tệp không thể đọc được. Vui lòng kiểm tra định dạng tệp trước khi gửi lại.
           </p>
         </div>
 
         {/* Diagnostics Metrics */}
         <div className="grid grid-cols-2 gap-space-xs py-space-sm mt-space-sm bg-surface-container-low border border-outline-variant/40 rounded-xl px-space-sm text-center">
           <div>
-            <span className="font-label-xs text-label-xs text-outline block">Detected Type</span>
-            <span className="font-label-md text-label-md text-on-surface font-semibold">Malformed Binary</span>
+            <span className="font-label-xs text-label-xs text-outline block">Loại tệp nhận diện</span>
+            <span className="font-label-md text-label-md text-on-surface font-semibold">Dữ liệu nhị phân lỗi</span>
           </div>
           <div>
-            <span className="font-label-xs text-label-xs text-outline block">Exit Code</span>
+            <span className="font-label-xs text-label-xs text-outline block">Mã lỗi</span>
             <span className="font-label-md text-label-md text-rose-600 font-mono font-semibold">
               {doc.errorCode || 'ERR_PDF_MAGIC_0x00'}
             </span>
@@ -452,7 +452,7 @@ export function DocumentCard({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-2xs active:scale-95"
         >
           <span className="material-symbols-outlined text-[16px] text-tertiary">replay</span>
-          Retry Processing
+          Thử xử lý lại
         </button>
         <button
           type="button"
@@ -460,7 +460,7 @@ export function DocumentCard({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-xs active:scale-95"
         >
           <span className="material-symbols-outlined text-[16px]">file_upload</span>
-          Replace File
+          Thay thế tệp
         </button>
       </div>
     </div>

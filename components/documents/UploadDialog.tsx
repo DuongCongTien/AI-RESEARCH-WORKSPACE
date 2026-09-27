@@ -32,7 +32,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
     setUploadStatus('idle');
     const maxSizeBytes = 25 * 1024 * 1024; // 25MB limit
     if (selected.size > maxSizeBytes) {
-      setErrorMessage('File size exceeds the 25MB maximum limit.');
+      setErrorMessage('Dung lượng tệp vượt quá giới hạn tối đa 25MB.');
       return;
     }
 
@@ -41,7 +41,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
     const hasValidExt = validExtensions.some((ext) => lowerName.endsWith(ext));
 
     if (!hasValidExt) {
-      setErrorMessage('Unsupported file format. Please upload PDF, DOCX, TXT, or JSON files.');
+      setErrorMessage('Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp PDF, DOCX, TXT hoặc JSON.');
       return;
     }
 
@@ -64,7 +64,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
 
     setUploadStatus('uploading');
     setUploadProgress(25);
-    setStepMessage('Uploading document payload...');
+    setStepMessage('Đang tải tệp dữ liệu lên...');
     setErrorMessage(null);
 
     const formData = new FormData();
@@ -75,7 +75,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
       await new Promise((r) => setTimeout(r, 200));
       setUploadProgress(65);
       setUploadStatus('processing');
-      setStepMessage('Extracting text and parsing document...');
+      setStepMessage('Đang trích xuất nội dung văn bản và phân tích...');
 
       const res = await fetch('/api/documents', {
         method: 'POST',
@@ -83,23 +83,23 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
       });
 
       setUploadProgress(90);
-      setStepMessage('Indexing vectors & finalizing...');
+      setStepMessage('Đang lập chỉ mục véc-tơ & hoàn tất...');
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to process document upload');
+        throw new Error(json.error || 'Xử lý tải lên tài liệu thất bại');
       }
 
       setUploadProgress(100);
       setUploadStatus('ready');
-      setStepMessage('Document processed successfully!');
+      setStepMessage('Đã xử lý tài liệu thành công!');
 
       setTimeout(() => {
         onUploaded(json.data);
       }, 700);
     } catch (err) {
       console.error('Upload error:', err);
-      const msg = err instanceof Error ? err.message : 'Upload failed. Please check network or file format.';
+      const msg = err instanceof Error ? err.message : 'Tải lên thất bại. Vui lòng kiểm tra kết nối mạng hoặc định dạng tệp.';
       setErrorMessage(msg);
       setUploadStatus('failed');
       setUploadProgress(0);
@@ -119,10 +119,10 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
             </div>
             <div>
               <span className="font-headline-sm text-headline-sm text-on-surface font-semibold block">
-                Upload Research Document
+                Tải lên tài liệu nghiên cứu
               </span>
               <span className="font-label-xs text-label-xs text-outline block">
-                Automatic OCR, Text Extraction &amp; Indexing
+                Tự động trích xuất nội dung, OCR &amp; lập chỉ mục
               </span>
             </div>
           </div>
@@ -179,16 +179,16 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
                 {file.name}
               </span>
               <span className="font-label-xs text-label-xs text-outline">
-                {(file.size / 1024).toFixed(1)} KB • Click to choose a different file
+                {(file.size / 1024).toFixed(1)} KB • Nhấn để chọn tệp khác
               </span>
             </div>
           ) : (
             <div className="space-y-1">
               <span className="font-body-md text-body-md text-on-surface font-semibold block">
-                Drag and drop research papers or documents here
+                Kéo và thả tài liệu nghiên cứu vào đây
               </span>
               <span className="font-label-xs text-label-xs text-outline block">
-                Supports PDF, DOCX, TXT, JSON (up to 25MB)
+                Hỗ trợ PDF, DOCX, TXT, JSON (tối đa 25MB)
               </span>
             </div>
           )}
@@ -214,7 +214,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
             disabled={isUploading}
             className="px-space-md py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm font-medium transition-colors cursor-pointer"
           >
-            Cancel
+            Hủy
           </button>
           <button
             type="button"
@@ -230,12 +230,12 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
               {uploadStatus === 'ready' ? 'check' : 'cloud_upload'}
             </span>
             {uploadStatus === 'uploading'
-              ? 'Uploading...'
+              ? 'Đang tải lên...'
               : uploadStatus === 'processing'
-                ? 'Processing...'
+                ? 'Đang xử lý...'
                 : uploadStatus === 'ready'
-                  ? 'Completed'
-                  : 'Start Ingestion'}
+                  ? 'Đã hoàn thành'
+                  : 'Bắt đầu nạp dữ liệu'}
           </button>
         </div>
       </div>

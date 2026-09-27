@@ -23,7 +23,7 @@ export function validateDocumentFile(fileName: string, fileSize: number): { vali
   if (fileSize > MAX_FILE_SIZE_BYTES) {
     return {
       valid: false,
-      error: `File size exceeds maximum allowed limit (${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB).`,
+      error: `Dung lượng tệp vượt quá giới hạn tối đa cho phép (${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB).`,
     };
   }
 
@@ -31,7 +31,7 @@ export function validateDocumentFile(fileName: string, fileSize: number): { vali
   if (!SUPPORTED_EXTENSIONS.includes(extension)) {
     return {
       valid: false,
-      error: `Unsupported file format (.${extension}). Supported formats: PDF, DOCX, TXT.`,
+      error: `Định dạng tệp không được hỗ trợ (.${extension}). Các định dạng hỗ trợ: PDF, DOCX, TXT.`,
     };
   }
 
@@ -48,14 +48,14 @@ export async function processDocumentFile(
 
   const validation = validateDocumentFile(fileName, fileSize);
   if (!validation.valid) {
-    throw new Error(validation.error || 'Invalid file');
+    throw new Error(validation.error || 'Tệp không hợp lệ');
   }
 
   let parsed: ParsedDocument;
   try {
     parsed = await parseDocument(fileBuffer, mimeType || extension, fileName);
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : 'Failed to parse document';
+    const errorMsg = error instanceof Error ? error.message : 'Phân tích tài liệu thất bại';
     return {
       fileName,
       fileType: extension,
@@ -79,7 +79,7 @@ export async function processDocumentFile(
   const chunks = chunkText(textContent);
 
   const previewSnippet = textContent.slice(0, 3000);
-  const parsedMarkdown = `# ${fileName}\n\n${previewSnippet}${textContent.length > 3000 ? '\n\n*...[Content truncated for preview]*' : ''}`;
+  const parsedMarkdown = `# ${fileName}\n\n${previewSnippet}${textContent.length > 3000 ? '\n\n*...[Nội dung đã được rút gọn để xem trước]*' : ''}`;
 
   return {
     fileName,

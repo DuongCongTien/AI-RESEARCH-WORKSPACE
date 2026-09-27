@@ -48,7 +48,7 @@ export function UploadProgress({
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
           )}
           <span className="text-xs font-semibold text-foreground truncate">
-            {fileName || 'Uploading document...'}
+            {fileName || 'Đang tải tài liệu lên...'}
           </span>
         </div>
         <DocumentStatus status={status} progress={progress} />
@@ -69,10 +69,10 @@ export function UploadProgress({
       {/* Status Details */}
       <div className="flex items-center justify-between mt-2 text-[11px] text-muted-foreground">
         <span>
-          {status === 'uploading' && `Uploading... ${progress}%`}
-          {status === 'processing' && (stepMessage || 'Processing document & indexing...')}
-          {status === 'ready' && 'Document ready for research synthesis!'}
-          {status === 'failed' && (error || 'Failed to process document.')}
+          {status === 'uploading' && `Đang tải lên... ${progress}%`}
+          {status === 'processing' && (stepMessage || 'Đang xử lý tài liệu & tạo chỉ mục...')}
+          {status === 'ready' && 'Tài liệu đã sẵn sàng để nghiên cứu!'}
+          {status === 'failed' && (error || 'Không thể xử lý tài liệu.')}
         </span>
         {status === 'failed' && onRetry && (
           <button
@@ -81,7 +81,7 @@ export function UploadProgress({
             className="inline-flex items-center gap-1 text-xs font-medium text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
           >
             <RefreshCw className="w-3 h-3" />
-            <span>Retry</span>
+            <span>Thử lại</span>
           </button>
         )}
       </div>

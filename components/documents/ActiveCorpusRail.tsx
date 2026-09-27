@@ -33,10 +33,10 @@ export function ActiveCorpusRail({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-space-xs">
             <span className="material-symbols-outlined text-[19px] text-tertiary animate-subtle-pulse">folder_open</span>
-            <span className="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Active Corpus</span>
+            <span className="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Tài nguyên nghiên cứu</span>
           </div>
           <span className="font-label-xs text-label-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold font-mono">
-            v2.4 Index
+            Chỉ mục v2.4
           </span>
         </div>
 
@@ -71,12 +71,12 @@ export function ActiveCorpusRail({
                     </div>
                     <span className="inline-flex items-center gap-1 font-label-xs text-label-xs px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-status-ripple"></span>
-                      Ready
+                      Sẵn sàng
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-2 pt-1 font-label-xs text-label-xs text-outline border-t border-outline-variant/30">
-                    <span>{fileSizeMB} • {doc.pages || 15} pages</span>
-                    <span>Synced {doc.uploadedAt || '12m ago'}</span>
+                    <span>{fileSizeMB} • {doc.pages || 15} trang</span>
+                    <span>Đã đồng bộ {doc.uploadedAt || '12 phút trước'}</span>
                   </div>
                 </div>
               );
@@ -104,11 +104,11 @@ export function ActiveCorpusRail({
                     </div>
                     <span className="inline-flex items-center gap-1 font-label-xs text-label-xs px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
                       <span className="material-symbols-outlined text-[12px] animate-spin">progress_activity</span>
-                      Processing
+                      Đang xử lý
                     </span>
                   </div>
                   <p className="font-label-xs text-label-xs text-primary font-medium mt-1 truncate">
-                    {doc.step || `Extracting text... (Chunk 18/42)`}
+                    {doc.step || `Đang trích xuất nội dung... (Đoạn 18/42)`}
                   </p>
                   <div className="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden mt-1.5">
                     <div
@@ -117,8 +117,8 @@ export function ActiveCorpusRail({
                     ></div>
                   </div>
                   <div className="flex items-center justify-between mt-1.5 font-label-xs text-label-xs text-outline border-t border-outline-variant/30 pt-1">
-                    <span>{fileSizeMB} • {doc.pages || 28} pages</span>
-                    <span>{doc.timeRemaining || 'Est. 20s'}</span>
+                    <span>{fileSizeMB} • {doc.pages || 28} trang</span>
+                    <span>{doc.timeRemaining || 'Dự kiến 20 giây'}</span>
                   </div>
                 </div>
               );
@@ -157,7 +157,7 @@ export function ActiveCorpusRail({
                   </div>
                   <div className="flex items-center justify-between mt-1.5 font-label-xs text-label-xs text-outline border-t border-outline-variant/30 pt-1">
                     <span>{fileSizeMB} • {doc.transferRate || '1.2 MB/s'}</span>
-                    <span>Uploading</span>
+                    <span>Đang tải lên</span>
                   </div>
                 </div>
               );
@@ -187,19 +187,19 @@ export function ActiveCorpusRail({
                       if (onRetryDoc) onRetryDoc(doc.id);
                     }}
                     className="inline-flex items-center gap-1 font-label-xs text-label-xs px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white transition-all font-semibold active:scale-95"
-                    title="Retry upload"
+                    title="Thử tải lại"
                     type="button"
                   >
                     <span className="material-symbols-outlined text-[12px]">refresh</span>
-                    Retry
+                    Thử lại
                   </button>
                 </div>
                 <p className="font-label-xs text-label-xs text-rose-600 font-medium mt-1 truncate">
-                  {doc.errorMsg || 'Corrupt PDF stream error'}
+                  {doc.errorMsg || 'Lỗi luồng dữ liệu PDF hỏng'}
                 </p>
                 <div className="flex items-center justify-between mt-1.5 font-label-xs text-label-xs text-outline border-t border-outline-variant/30 pt-1">
-                  <span>Unknown Size</span>
-                  <span className="text-rose-600 font-semibold">Parsing failed</span>
+                  <span>Kích thước không rõ</span>
+                  <span className="text-rose-600 font-semibold">Phân tích thất bại</span>
                 </div>
               </div>
             );
@@ -210,7 +210,7 @@ export function ActiveCorpusRail({
       {/* Quick Summary Footer */}
       <div className="p-space-md bg-surface-container-low border-t border-outline-variant/60 flex flex-col gap-space-xs">
         <div className="flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs">
-          <span className="font-medium">Corpus Storage</span>
+          <span className="font-medium">Dung lượng tài nguyên</span>
           <span className="text-on-surface font-semibold font-mono">{totalMB} MB / {maxStorageMB} MB</span>
         </div>
         <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
@@ -220,11 +220,11 @@ export function ActiveCorpusRail({
           ></div>
         </div>
         <div className="flex items-center justify-between pt-1 font-label-xs text-label-xs text-outline">
-          <span>{documents.length} Documents</span>
+          <span>{documents.length} Tài liệu</span>
           <span className="flex items-center gap-1 font-medium">
-            <span className="text-emerald-600 font-semibold">{readyCount} Ready</span> •{' '}
-            <span className="text-primary font-semibold">{procCount} Proc</span> •{' '}
-            <span className="text-rose-600 font-semibold">{failCount} Fail</span>
+            <span className="text-emerald-600 font-semibold">{readyCount} Sẵn sàng</span> •{' '}
+            <span className="text-primary font-semibold">{procCount} Đang xử lý</span> •{' '}
+            <span className="text-rose-600 font-semibold">{failCount} Lỗi</span>
           </span>
         </div>
       </div>

@@ -54,7 +54,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
             type="button"
             onClick={onToggleMobileMenu}
             className="lg:hidden p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors active:scale-95"
-            aria-label="Open Navigation Drawer"
+            aria-label="Mở danh mục điều hướng"
           >
             <span className="material-symbols-outlined text-[22px]">menu</span>
           </button>
@@ -62,7 +62,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
           {/* Lab Selector */}
           <div className="hidden sm:flex items-center gap-space-xs text-on-surface-variant hover:text-on-surface cursor-pointer bg-surface-container-low hover:bg-surface-container-high px-space-sm py-1.5 rounded-lg border border-outline-variant/60 shadow-xs transition-all duration-200">
             <span className="material-symbols-outlined text-[16px] text-tertiary animate-subtle-pulse">science</span>
-            <span className="font-body-sm text-body-sm font-semibold text-on-surface">Stanford AI Lab</span>
+            <span className="font-body-sm text-body-sm font-semibold text-on-surface">Phòng Thí nghiệm AI</span>
             <span className="material-symbols-outlined text-[16px]">unfold_more</span>
           </div>
 
@@ -74,7 +74,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
               type="button"
               onClick={() => setShowModelMenu(!showModelMenu)}
               className="flex items-center gap-space-xs px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container border border-outline-variant/70 shadow-xs hover:shadow-sm hover:border-primary/40 transition-all duration-200 text-left active:scale-[0.98]"
-              title="Select Active Intelligence Engine"
+              title="Chọn mô hình AI hoạt động"
             >
               <span className="w-2 h-2 rounded-full bg-tertiary animate-status-ripple shrink-0"></span>
               <span className="font-label-sm text-label-sm text-on-surface font-medium truncate max-w-[170px] sm:max-w-[280px]">
@@ -88,7 +88,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
             {showModelMenu && (
               <div className="absolute left-0 mt-2 w-72 rounded-xl bg-surface border border-outline-variant/80 shadow-xl py-1.5 z-50 animate-fade-in-up">
                 <div className="px-3 py-1 font-label-xs text-label-xs uppercase tracking-wider text-outline font-semibold">
-                  Synthesizing Engines
+                  Mô hình tổng hợp AI
                 </div>
                 {models.map((m) => (
                   <button
@@ -117,7 +117,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
         <div className="flex items-center gap-2 lg:gap-space-md shrink-0">
           <button
             className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg border border-outline-variant/40 hover:border-primary/30 shadow-2xs transition-all duration-200 active:scale-90"
-            title={isDarkMode ? 'Switch to Light Theme (White Background)' : 'Switch to Dark Theme'}
+            title={isDarkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
             type="button"
             onClick={handleToggleTheme}
           >
@@ -128,7 +128,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
 
           <button
             className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg border border-outline-variant/40 hover:border-tertiary/30 shadow-2xs transition-all duration-200 active:scale-90"
-            title="Execution Telemetry"
+            title="Thông số vận hành hệ thống"
             type="button"
             onClick={() => setShowTelemetryModal(!showTelemetryModal)}
           >
@@ -141,14 +141,14 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
           <Link
             href="/settings"
             className="flex items-center gap-space-sm pl-space-xs hover:opacity-90 transition-all group"
-            title="Account Profile"
+            title="Hồ sơ tài khoản"
           >
             <div className="w-8 h-8 rounded-full border border-outline-variant/60 overflow-hidden bg-primary-container text-primary font-bold text-xs flex items-center justify-center shadow-xs group-hover:ring-2 group-hover:ring-primary/30 transition-all">
               EV
             </div>
             <div className="hidden xl:flex flex-col text-left">
-              <span className="font-body-sm text-body-sm leading-none font-semibold text-on-surface">Dr. Elena Vance</span>
-              <span className="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Lead Investigator</span>
+              <span className="font-body-sm text-body-sm leading-none font-semibold text-on-surface">TS. Elena Vance</span>
+              <span className="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Nghiên cứu viên trưởng</span>
             </div>
           </Link>
         </div>
@@ -161,7 +161,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
             <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-tertiary text-[20px] animate-pulse">terminal</span>
-                <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">Studio Runtime Telemetry</span>
+                <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">Thông số vận hành hệ thống</span>
               </div>
               <button
                 type="button"
@@ -174,12 +174,12 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
             <div className="bg-surface-container-low border border-outline-variant/50 p-3.5 rounded-xl font-label-xs text-label-xs text-tertiary space-y-1.5 font-mono shadow-inner">
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>[SYSTEM] Memory allocated: 382.4 MB / 1024 MB</span>
+                <span>[HỆ THỐNG] Bộ nhớ đã cấp phát: 382.4 MB / 1024 MB</span>
               </div>
-              <div>[RAG_PIPELINE] Vector database index health: 98.4%</div>
-              <div>[EMBEDDING] text-embedding-3-large active</div>
-              <div>[STREAMING] Server-Sent Events SSE latency: 12ms</div>
-              <div>[ACTIVE_SESSIONS] 1 investigator session active</div>
+              <div>[RAG_PIPELINE] Trạng thái cơ sở dữ liệu véc-tơ: 98.4%</div>
+              <div>[MÃ_HÓA_NHÚNG] Mô hình text-embedding-3-large đang hoạt động</div>
+              <div>[TRUYỀN_PHÁT] Độ trễ luồng SSE: 12ms</div>
+              <div>[PHIÊN_LÀM_VIỆC] 1 phiên nghiên cứu đang hoạt động</div>
             </div>
             <div className="flex justify-end">
               <button
@@ -187,7 +187,7 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
                 onClick={() => setShowTelemetryModal(false)}
                 className="px-4 py-2 rounded-xl bg-primary text-on-primary font-body-sm text-body-sm font-medium hover:opacity-90 transition-all shadow-xs active:scale-95"
               >
-                Dismiss
+                Đóng
               </button>
             </div>
           </div>

@@ -34,7 +34,7 @@ export function DocumentFilters({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search documents by name, tag, or content..."
+          placeholder="Tìm kiếm tài liệu theo tên, thẻ hoặc nội dung..."
           className="w-full bg-surface pl-10 pr-4 py-2 rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-xs border border-outline-variant/60"
         />
         {searchQuery && (
@@ -56,10 +56,10 @@ export function DocumentFilters({
             onChange={(e) => onTypeFilterChange(e.target.value)}
             className="w-full bg-surface px-3 py-2 rounded-xl text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer border border-outline-variant/60 shadow-xs transition-all"
           >
-            <option value="all">Type: All Types</option>
-            <option value="pdf">PDF Document (.pdf)</option>
-            <option value="docx">Word File (.docx)</option>
-            <option value="txt">Plain Text (.txt)</option>
+            <option value="all">Định dạng: Tất cả</option>
+            <option value="pdf">Tài liệu PDF (.pdf)</option>
+            <option value="docx">Tệp Word (.docx)</option>
+            <option value="txt">Văn bản thuần (.txt)</option>
           </select>
           <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-outline pointer-events-none">
             unfold_more
@@ -75,11 +75,11 @@ export function DocumentFilters({
             onChange={(e) => onStatusFilterChange(e.target.value)}
             className="w-full bg-surface px-3 py-2 rounded-xl text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer border border-outline-variant/60 shadow-xs transition-all"
           >
-            <option value="all">Status: All Statuses</option>
-            <option value="ready">Ready (Indexed)</option>
-            <option value="processing">Processing</option>
-            <option value="uploading">Uploading</option>
-            <option value="failed">Failed</option>
+            <option value="all">Trạng thái: Tất cả</option>
+            <option value="ready">Sẵn sàng (Đã chỉ mục)</option>
+            <option value="processing">Đang xử lý</option>
+            <option value="uploading">Đang tải lên</option>
+            <option value="failed">Thất bại</option>
           </select>
           <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-outline pointer-events-none">
             unfold_more
@@ -95,10 +95,10 @@ export function DocumentFilters({
             onChange={(e) => onSortChange(e.target.value)}
             className="w-full bg-surface px-3 py-2 rounded-xl text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer border border-outline-variant/60 shadow-xs transition-all"
           >
-            <option value="date">Sort: Date Added</option>
-            <option value="size">Sort: File Size</option>
-            <option value="quality">Sort: Index Quality</option>
-            <option value="title">Sort: Title (A-Z)</option>
+            <option value="date">Sắp xếp: Ngày thêm</option>
+            <option value="size">Sắp xếp: Dung lượng tệp</option>
+            <option value="quality">Sắp xếp: Chất lượng chỉ mục</option>
+            <option value="title">Sắp xếp: Tiêu đề (A-Z)</option>
           </select>
           <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-outline pointer-events-none">
             sort

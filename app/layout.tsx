@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ResearchAI Studio Core | Intelligent Document & Multi-Agent Synthesis',
+  title: 'ResearchAI Studio | Không Gian Nghiên Cứu & Tổng Hợp Tài Liệu AI',
   description:
-    'Advanced AI Research Workspace for multi-document synthesis, corpus indexing, semantic retrieval, and structured intelligence.',
+    'Không gian nghiên cứu AI hỗ trợ tổng hợp đa tài liệu, chỉ mục ngữ nghĩa, truy xuất thông minh và phân tích chuyên sâu.',
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <meta name="shell-type" content="web_dashboard" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -35,7 +35,7 @@ export function DocumentToolbar({
             className="w-4 h-4 rounded bg-surface-container-high accent-primary cursor-pointer transition-transform group-hover:scale-110"
           />
           <span className="font-body-sm text-body-sm text-on-surface font-semibold group-hover:text-primary transition-colors">
-            Select All ({selectedCount} selected)
+            Chọn tất cả ({selectedCount} đã chọn)
           </span>
         </label>
 
@@ -52,7 +52,7 @@ export function DocumentToolbar({
           }`}
         >
           <span className="material-symbols-outlined text-[16px]">delete</span>
-          Remove Selected
+          Xóa các mục đã chọn
         </button>
 
         <button
@@ -62,7 +62,7 @@ export function DocumentToolbar({
           className="inline-flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-2.5 py-1 rounded-lg transition-all cursor-pointer hover:shadow-xs active:scale-95"
         >
           <span className="material-symbols-outlined text-[16px] text-primary">toggle_on</span>
-          Toggle Context All
+          Bật/Tắt ngữ cảnh tất cả
         </button>
       </div>
 
@@ -70,11 +70,11 @@ export function DocumentToolbar({
       <div className="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-xs text-label-xs border border-outline-variant/40 shadow-2xs hover:border-primary/30 transition-colors">
         <span className="material-symbols-outlined text-[14px] text-tertiary">hub</span>
         <span>
-          Model: <strong className="text-on-surface font-semibold">{embeddingModel}</strong>
+          Mô hình: <strong className="text-on-surface font-semibold">{embeddingModel}</strong>
         </span>
         <span className="text-outline">•</span>
         <span>
-          <strong className="text-on-surface font-semibold">{tokensIndexed.toLocaleString()}</strong> Tokens
+          <strong className="text-on-surface font-semibold">{tokensIndexed.toLocaleString()}</strong> Token
         </span>
       </div>
     </div>

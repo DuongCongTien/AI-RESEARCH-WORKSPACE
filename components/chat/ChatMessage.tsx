@@ -21,22 +21,26 @@ function formatResponseForClipboard(
   const parts: string[] = [];
 
   if (structured.summary) {
-    parts.push(`SUMMARY:\n${structured.summary}`);
+    parts.push(`TÓM TẮT:\n${structured.summary}`);
   }
 
   const keyPoints = structured.key_points || structured.keyPoints || [];
   if (keyPoints.length > 0) {
-    parts.push(`KEY POINTS:\n${keyPoints.map((p) => `• ${p}`).join('\n')}`);
+    parts.push(`ĐIỂM CỐT LÕI:\n${keyPoints.map((p) => `• ${p}`).join('\n')}`);
   }
 
   if (structured.risks && structured.risks.length > 0) {
     parts.push(
-      `RISKS:\n${structured.risks
+      `RỦI RO:\n${structured.risks
         .map(
           (r) =>
-            `• [${r.severity.toUpperCase()}] ${r.title}${
-              r.description ? `: ${r.description}` : ''
-            }`
+            `• [${
+              r.severity === 'high'
+                ? 'RỦI RO CAO'
+                : r.severity === 'medium'
+                ? 'RỦI RO TRUNG BÌNH'
+                : 'RỦI RO THẤP'
+            }] ${r.title}${r.description ? `: ${r.description}` : ''}`
         )
         .join('\n')}`
     );
@@ -44,7 +48,7 @@ function formatResponseForClipboard(
 
   if (structured.actions && structured.actions.length > 0) {
     parts.push(
-      `RECOMMENDED ACTIONS:\n${structured.actions
+      `KHUYẾN NGHỊ HÀNH ĐỘNG:\n${structured.actions
         .map(
           (a, i) =>
             `${i + 1}. ${a.title}${a.description ? ` - ${a.description}` : ''}`
@@ -55,10 +59,10 @@ function formatResponseForClipboard(
 
   if (structured.sources && structured.sources.length > 0) {
     parts.push(
-      `SOURCES:\n${structured.sources
+      `NGUỒN TRÍCH DẪN:\n${structured.sources
         .map(
           (s) =>
-            `• ${s.documentName}${s.page ? ` (Page ${s.page})` : ''}${
+            `• ${s.documentName}${s.page ? ` (Trang ${s.page})` : ''}${
               s.excerpt ? ` - "${s.excerpt}"` : ''
             }`
         )
@@ -87,7 +91,6 @@ export function ChatMessage({
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(textToCopy);
       } else {
-        // Fallback for non-secure contexts
         const textArea = document.createElement('textarea');
         textArea.value = textToCopy;
         textArea.style.position = 'fixed';
@@ -102,7 +105,7 @@ export function ChatMessage({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      console.error('Lỗi sao chép vào bộ nhớ tạm:', err);
     }
   };
 
@@ -112,7 +115,7 @@ export function ChatMessage({
         isUser ? 'flex-row-reverse pl-6 sm:pl-16' : 'pr-2 sm:pr-8'
       } animate-fade-in-up`}
     >
-      {/* Avatar */}
+      {/* Ảnh đại diện */}
       <div
         className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
           isUser
@@ -127,70 +130,72 @@ export function ChatMessage({
         )}
       </div>
 
-      {/* Message Content Container */}
+      {/* Khung nội dung tin nhắn */}
       <div
         className={`flex flex-col flex-1 min-w-0 ${
           isUser ? 'items-end max-w-[85%]' : 'items-start max-w-full'
         }`}
       >
         {isUser ? (
-          /* User Bubble */
+          /* Bong bóng tin nhắn người dùng */
           <div className="rounded-2xl rounded-tr-xs px-4 py-3 bg-primary text-primary-foreground text-sm leading-relaxed shadow-xs whitespace-pre-wrap break-words">
             {message.content}
           </div>
         ) : (
-          /* Assistant Response */
+          /* Khung phản hồi trợ lý AI */
           <div className="w-full space-y-3">
             {message.structuredResponse ? (
-              /* Structured Response View */
+              /* Thẻ có cấu trúc */
               <ResearchResponse response={message.structuredResponse} />
             ) : (
-              /* Plain text fallback */
+              /* Dạng văn bản thuần dự phòng */
               <div className="rounded-2xl rounded-tl-xs px-4 py-3 bg-surface border border-border text-foreground text-sm leading-relaxed shadow-xs whitespace-pre-wrap break-words">
                 {message.content}
               </div>
             )}
 
-            {/* Action Bar: Copy & Regenerate */}
+            {/* Thanh tác vụ: Sao chép & Tạo lại */}
             <div className="flex items-center gap-2 pt-1 px-1 text-xs text-muted-foreground">
-              {/* Copy Button */}
+              {/* Nút Sao chép */}
               <button
                 type="button"
                 onClick={handleCopy}
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-surface hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs active:scale-95"
-                title="Copy formatted answer"
+                title="Sao chép câu trả lời có định dạng"
+                aria-label="Sao chép câu trả lời"
               >
                 {copied ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-emerald-500 font-medium">Copied</span>
+                    <span className="text-emerald-500 font-medium">Đã sao chép</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Copy</span>
+                    <span>Sao chép</span>
                   </>
                 )}
               </button>
 
-              {/* Regenerate Button */}
+              {/* Nút Tạo lại */}
               {onRegenerate && (
                 <button
                   type="button"
                   onClick={onRegenerate}
                   disabled={isRegenerating}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-surface hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Regenerate this response"
+                  title="Tạo lại câu trả lời này"
+                  aria-label="Tạo lại câu trả lời"
                 >
                   {isRegenerating ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-                      <span>Regenerating...</span>
+                      <span>Đang tạo lại...</span>
                     </>
                   ) : (
                     <>
                       <RotateCw className="w-3.5 h-3.5" />
-                      <span>Regenerate</span>
+                      <span>Tạo lại</span>
                     </>
                   )}
                 </button>
@@ -203,5 +208,5 @@ export function ChatMessage({
   );
 }
 
-// Re-export as MessageItem for backwards compatibility
+// Export MessageItem để tương thích ngược
 export { ChatMessage as MessageItem };

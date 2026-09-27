@@ -30,7 +30,7 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to upload document');
+        throw new Error(json.error || 'Không thể tải tài liệu lên');
       }
 
       if (onUploaded && json.data) {
@@ -38,7 +38,7 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage(err instanceof Error ? err.message : 'Upload failed');
+      setErrorMessage(err instanceof Error ? err.message : 'Tải lên thất bại');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -84,7 +84,7 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
           ) : (
             <Plus className="h-3.5 w-3.5" />
           )}
-          <span>{isUploading ? 'Parsing text...' : 'Attach Document'}</span>
+          <span>{isUploading ? 'Đang phân tích...' : 'Đính kèm tài liệu'}</span>
         </button>
         {errorMessage && (
           <p className="mt-1.5 text-[11px] text-destructive">{errorMessage}</p>
@@ -125,10 +125,10 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
           )}
         </div>
         <p className="text-xs font-medium text-foreground">
-          {isUploading ? 'Extracting text and structure...' : 'Upload Research Papers & Docs'}
+          {isUploading ? 'Đang trích xuất nội dung và cấu trúc...' : 'Tải lên tài liệu nghiên cứu & tệp tin'}
         </p>
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Supports PDF, DOCX, TXT, MD
+          Hỗ trợ PDF, DOCX, TXT, MD
         </p>
       </div>
       {errorMessage && (

@@ -19,46 +19,46 @@ export function EmptyChat({
 }: EmptyChatProps) {
   const suggestions = [
     {
-      title: 'Summarize key findings',
+      title: 'Tóm tắt các phát hiện cốt lõi',
       icon: <FileText className="w-4 h-4 text-primary" />,
-      query: 'Summarize the core findings and operational takeaways from the selected documents.',
+      query: 'Tóm tắt các phát hiện cốt lõi và các chỉ số hoạt động quan trọng từ những tài liệu đã chọn.',
     },
     {
-      title: 'Analyze critical risks',
+      title: 'Phân tích các rủi ro quan trọng',
       icon: <ShieldAlert className="w-4 h-4 text-amber-500" />,
-      query: 'What are the main risks, vulnerabilities, or bottlenecks identified in the documents?',
+      query: 'Những rủi ro, lỗ hổng kỹ thuật hoặc điểm nghẽn chính được xác định trong tài liệu là gì?',
     },
     {
-      title: 'Extract methodologies & metrics',
+      title: 'Trích xuất phương pháp & chỉ số',
       icon: <ListChecks className="w-4 h-4 text-emerald-500" />,
-      query: 'Extract the key metrics, quantitative benchmarks, and experimental methodologies used.',
+      query: 'Trích xuất các chỉ số định lượng, tiêu chuẩn kiểm thử và phương pháp luận nghiên cứu được sử dụng.',
     },
     {
-      title: 'Recommended action plan',
+      title: 'Kế hoạch hành động đề xuất',
       icon: <Sparkles className="w-4 h-4 text-indigo-500" />,
-      query: 'What concrete actions and next steps are recommended based on these findings?',
+      query: 'Những hành động cụ thể và các bước tiếp theo được khuyến nghị dựa trên kết quả này là gì?',
     },
   ];
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-2xl mx-auto my-auto animate-fade-in-up">
-      {/* Brand Icon Badge */}
+      {/* Biểu tượng thương hiệu */}
       <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 shadow-sm border border-primary/20">
         <Sparkles className="w-7 h-7" />
       </div>
 
       <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1.5 tracking-tight">
-        Start your research
+        Bắt đầu nghiên cứu
       </h2>
       <p className="text-sm text-muted-foreground mb-6 max-w-md leading-relaxed">
-        Upload documents and ask AI questions about your research. The assistant grounds every answer strictly in your document corpus.
+        Tải tài liệu lên và đặt câu hỏi cho AI về nghiên cứu của bạn. Trợ lý AI sẽ đối chiếu và trả lời bám sát toàn bộ tài liệu đã cung cấp.
       </p>
 
-      {/* Edge Case 1: No documents uploaded at all */}
+      {/* Trường hợp 1: Chưa có tài liệu nào trong workspace */}
       {totalDocsCount === 0 && (
         <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 text-center max-w-md w-full">
           <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-3">
-            Upload at least one document to start research.
+            Tải lên ít nhất một tài liệu để bắt đầu nghiên cứu.
           </p>
           {onOpenUpload ? (
             <button
@@ -67,7 +67,7 @@ export function EmptyChat({
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Upload className="w-3.5 h-3.5" />
-              <span>Upload Document</span>
+              <span>Tải tài liệu lên</span>
             </button>
           ) : (
             <Link
@@ -75,21 +75,21 @@ export function EmptyChat({
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Upload className="w-3.5 h-3.5" />
-              <span>Upload Document</span>
+              <span>Tải tài liệu lên</span>
             </Link>
           )}
         </div>
       )}
 
-      {/* Edge Case 2: Documents exist, but none currently checked */}
+      {/* Trường hợp 2: Có tài liệu nhưng chưa chọn tài liệu nào */}
       {totalDocsCount > 0 && !hasSelectedDocs && (
         <div className="mb-6 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-2 text-left max-w-md">
           <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>Please select at least one document from the context panel to ground your inquiry.</span>
+          <span>Vui lòng chọn ít nhất một tài liệu từ bảng ngữ cảnh để đối chiếu câu hỏi.</span>
         </div>
       )}
 
-      {/* Suggested Prompts Grid */}
+      {/* Lưới các câu hỏi gợi ý */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         {suggestions.map((item, index) => (
           <button
@@ -116,5 +116,5 @@ export function EmptyChat({
   );
 }
 
-// Re-export as EmptyState for backwards compatibility
+// Export EmptyState để tương thích ngược
 export { EmptyChat as EmptyState };

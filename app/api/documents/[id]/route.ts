@@ -13,13 +13,13 @@ export async function GET(
     });
 
     if (!doc) {
-      return NextResponse.json({ success: false, error: 'Document not found' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Không tìm thấy tài liệu' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: doc });
   } catch (err) {
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : 'Database error' },
+      { success: false, error: err instanceof Error ? err.message : 'Lỗi cơ sở dữ liệu' },
       { status: 500 }
     );
   }
@@ -44,7 +44,7 @@ export async function PATCH(
     return NextResponse.json({ success: true, data: updated });
   } catch (err) {
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : 'Update failed' },
+      { success: false, error: err instanceof Error ? err.message : 'Cập nhật thất bại' },
       { status: 500 }
     );
   }

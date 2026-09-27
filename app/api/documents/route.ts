@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Không có tệp nào được cung cấp' }, { status: 400 });
     }
 
     const fileName = file.name;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const validation = validateDocumentFile(fileName, fileSize);
     if (!validation.valid) {
       return NextResponse.json(
-        { success: false, error: validation.error || 'Invalid file format or size' },
+        { success: false, error: validation.error || 'Định dạng tệp hoặc kích thước không hợp lệ' },
         { status: 400 }
       );
     }
@@ -92,12 +92,12 @@ export async function POST(req: NextRequest) {
       indexHealth: processed.status === 'ready' ? 98.4 : 0,
       status: processed.status,
       progress: processed.status === 'ready' ? 100 : 0,
-      step: processed.status === 'ready' ? 'Indexed and vector embedded' : 'Failed during byte parsing',
+      step: processed.status === 'ready' ? 'Đã lập chỉ mục và nhúng véc-tơ' : 'Thất bại trong quá trình phân tích dữ liệu',
       errorMsg: processed.errorMsg,
       errorCode: processed.status === 'failed' ? 'ERR_PARSE_FAIL' : null,
       inContext: true,
-      uploadedBy: 'Dr. Elena Vance',
-      uploadedAt: 'Just now',
+      uploadedBy: 'TS. Elena Vance',
+      uploadedAt: 'Vừa xong',
       content: processed.textContent,
       textContent: processed.textContent,
       parsedMarkdown: processed.parsedMarkdown,
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Document upload error:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown upload error' },
+      { success: false, error: error instanceof Error ? error.message : 'Lỗi tải lên không xác định' },
       { status: 500 }
     );
   }
@@ -190,7 +190,7 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'Document ID is required' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Cần cung cấp mã định danh tài liệu (ID)' }, { status: 400 });
     }
 
     try {
@@ -199,10 +199,10 @@ export async function DELETE(req: NextRequest) {
       removeSharedDocument(id);
     }
 
-    return NextResponse.json({ success: true, message: 'Document removed from active corpus.' });
+    return NextResponse.json({ success: true, message: 'Đã xóa tài liệu khỏi không gian nghiên cứu.' });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Failed to delete' },
+      { success: false, error: error instanceof Error ? error.message : 'Xóa tài liệu thất bại' },
       { status: 500 }
     );
   }

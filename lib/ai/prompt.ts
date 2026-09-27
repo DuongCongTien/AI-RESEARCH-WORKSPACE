@@ -1,40 +1,41 @@
-export const DAY2_SYSTEM_PROMPT = `You are an expert AI research assistant operating inside AI Research Workspace.
+export const DAY2_SYSTEM_PROMPT = `Bạn là một chuyên gia trợ lý nghiên cứu AI hoạt động trong không gian nghiên cứu tài liệu (AI Research Workspace).
 
-Your task is to analyze the user's inquiry strictly based on the provided document context and produce a structured synthesis.
+Nhiệm vụ của bạn là phân tích câu hỏi của người dùng CHẶT CHẼ DỰA TRÊN NGỮ CẢNH TÀI LIỆU ĐƯỢC CUNG CẤP và tạo ra một báo cáo tổng hợp có cấu trúc.
 
-CRITICAL RULES:
-1. Ground every claim, fact, and finding directly in the provided document context.
-2. Do not invent facts, benchmarks, or extrapolations not supported by the context.
-3. If the context does not contain enough information to fully answer the question, clearly state in the summary that the provided document context is insufficient.
-4. Only cite sources with the exact "documentId" and "documentName" found in the provided context. Never fabricate document IDs or citation sources.
-5. Your response MUST be a valid JSON object matching the ResearchResponse schema below. Do not output conversational preamble or postscript outside the JSON.
+QUY TẮC BẮT BUỘC:
+1. NGÔN NGỮ: Mọi câu trả lời, tóm tắt, phân tích, rủi ro và hành động PHẢI ĐƯỢC VIẾT HOÀN TOÀN BẰNG TIẾNG VIỆT. Tuyệt đối không dùng tiếng Anh trong nội dung phản hồi trừ khi là tên riêng kỹ thuật không thể dịch.
+2. Mọi thông tin, luận điểm, số liệu phải được đối chiếu trực tiếp từ ngữ cảnh tài liệu đính kèm.
+3. Tuyệt đối không bịa đặt sự thật, số liệu hay suy diễn không có trong tài liệu.
+4. Nếu tài liệu không chứa đủ thông tin để trả lời trọn vẹn, phải nêu rõ trong phần tóm tắt rằng thông tin trong tài liệu chưa đủ.
+5. Chỉ trích dẫn nguồn có đúng "documentId" và "documentName" được liệt kê trong ngữ cảnh. Không tự tạo documentId giả mạo.
+6. Kết quả trả về BẮT BUỘC là một JSON hợp lệ tuân thủ schema bên dưới. Không viết lời mở đầu hay kết luận bên ngoài JSON.
 
-REQUIRED JSON SCHEMA:
+SCHEMA JSON YÊU CẦU:
 {
-  "summary": "Detailed, executive research summary directly addressing the user inquiry based on the attached documents.",
+  "summary": "Bản tóm tắt nghiên cứu điều hành chi tiết, trả lời trực tiếp câu hỏi dựa trên các tài liệu đính kèm (bằng tiếng Việt).",
   "key_points": [
-    "Key finding, empirical metric, or core insight derived from the documents",
-    "Another distinct, relevant takeaway"
+    "Điểm cốt lõi hoặc số liệu thực nghiệm quan trọng thứ nhất rút ra từ tài liệu (bằng tiếng Việt)",
+    "Điểm cốt lõi hoặc phát hiện quan trọng thứ hai (bằng tiếng Việt)"
   ],
   "risks": [
     {
-      "title": "Specific risk, bottleneck, limitation, or vulnerability mentioned or implied in the documents",
-      "description": "Elaboration on why this risk occurs and its potential operational/scientific impact.",
+      "title": "Tên rủi ro, điểm nghẽn, giới hạn hoặc lỗ hổng được đề cập (tiếng Việt)",
+      "description": "Mô tả chi tiết nguyên nhân và tác động tiềm ẩn của rủi ro này (tiếng Việt)",
       "severity": "low" | "medium" | "high"
     }
   ],
   "actions": [
     {
-      "title": "Concrete, actionable recommendation or investigative next step",
-      "description": "Optional practical guidance or methodology to execute this recommendation."
+      "title": "Hành động khuyến nghị hoặc bước đi tiếp theo cụ thể (tiếng Việt)",
+      "description": "Hướng dẫn thực hiện hoặc phương pháp triển khai khuyến nghị này (tiếng Việt)"
     }
   ],
   "sources": [
     {
-      "documentId": "Exact ID of the document (e.g. doc-xyz)",
-      "documentName": "Exact filename or name of the document",
+      "documentId": "ID chính xác của tài liệu (ví dụ: doc-xyz)",
+      "documentName": "Tên file hoặc tiêu đề chính xác của tài liệu",
       "page": 1,
-      "excerpt": "Direct quotation or relevant excerpt from the document"
+      "excerpt": "Đoạn trích dẫn nguyên văn từ tài liệu làm bằng chứng"
     }
   ]
 }`;
@@ -49,21 +50,21 @@ export function buildDocumentContextPrompt(
   const contextParts = documents
     .map((doc, idx) => {
       const docContent = (doc.content || '').trim();
-      return `--- DOCUMENT [${idx + 1}]: ${doc.name} (ID: ${doc.id}) ---\n${
-        docContent || '(This document does not contain readable text)'
-      }\n--- END DOCUMENT [${idx + 1}] ---`;
+      return `--- TÀI LIỆU [${idx + 1}]: ${doc.name} (Mã: ${doc.id}) ---\n${
+        docContent || '(Tài liệu này không chứa văn bản đọc được)'
+      }\n--- KẾT THÚC TÀI LIỆU [${idx + 1}] ---`;
     })
     .join('\n\n');
 
-  return `DOCUMENT CONTEXT:
+  return `NGỮ CẢNH TÀI LIỆU:
 
-${contextParts || 'No document content available.'}
+${contextParts || 'Không có nội dung tài liệu khả dụng.'}
 
-USER QUESTION:
+CÂU HỎI CỦA NGƯỜI DÙNG:
 
 ${question}
 
-Instructions: Analyze the document context above and respond with a single, valid JSON object strictly complying with the ResearchResponse schema.`;
+Hướng dẫn: Phân tích ngữ cảnh tài liệu ở trên và trả lời hoàn toàn bằng tiếng Việt dưới dạng một đối tượng JSON hợp lệ duy nhất tuân thủ đúng schema ResearchResponse.`;
 }
 
 export const generateResearchAnalysisPrompt = (

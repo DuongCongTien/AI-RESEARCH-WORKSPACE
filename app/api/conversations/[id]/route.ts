@@ -59,7 +59,7 @@ export async function GET(
     // Create transient instance if not found
     const transient = {
       id,
-      title: 'New Research Chat',
+      title: 'Cuộc trò chuyện mới',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       messages: [],
@@ -69,7 +69,7 @@ export async function GET(
     return NextResponse.json({ success: true, data: transient });
   } catch (err) {
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : 'Database error' },
+      { success: false, error: err instanceof Error ? err.message : 'Lỗi cơ sở dữ liệu' },
       { status: 500 }
     );
   }
@@ -104,7 +104,7 @@ export async function PATCH(
     }
   } catch (err) {
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : 'Update error' },
+      { success: false, error: err instanceof Error ? err.message : 'Lỗi cập nhật' },
       { status: 500 }
     );
   }
@@ -122,10 +122,10 @@ export async function DELETE(
       // Ignore if not present in DB
     }
     deleteSharedConversation(id);
-    return NextResponse.json({ success: true, message: 'Conversation deleted' });
+    return NextResponse.json({ success: true, message: 'Đã xóa cuộc trò chuyện' });
   } catch (err) {
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : 'Delete error' },
+      { success: false, error: err instanceof Error ? err.message : 'Lỗi xóa' },
       { status: 500 }
     );
   }

@@ -16,11 +16,11 @@ import {
 
 function cleanTitle(question: string): string {
   const cleaned = question
-    .replace(/^(what are|what is|how do|can you|please|summarize|explain|tell me about)\s+/i, '')
+    .replace(/^(những|các|cho tôi biết|hãy|tóm tắt|giải thích|phân tích|what are|what is|how do|can you|please|summarize|explain|tell me about)\s+/i, '')
     .replace(/[?!.]+$/, '')
     .trim();
   const capped = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-  return capped.length > 40 ? capped.slice(0, 37) + '...' : capped || 'Research Inquiry';
+  return capped.length > 40 ? capped.slice(0, 37) + '...' : capped || 'Nghiên cứu mới';
 }
 
 function validateAndMapSources(
@@ -68,46 +68,46 @@ function buildDeterministicStructuredResponse(
   const combinedContent = attachedDocs.map((d) => d.content).join(' ');
   const lowerQ = message.toLowerCase();
 
-  let summary = `Based on the provided research context in ${allDocNames}, this inquiry regarding "${message}" has been analyzed against indexed operational findings.`;
+  let summary = `Dựa trên ngữ cảnh nghiên cứu từ ${allDocNames}, câu hỏi "${message}" đã được đối chiếu và phân tích toàn diện.`;
   if (combinedContent.length > 100) {
-    summary += ` The documents demonstrate that ${combinedContent.slice(0, 240)}...`;
+    summary += ` Tài liệu cho thấy rằng: ${combinedContent.slice(0, 240)}...`;
   }
 
   const keyPoints: string[] = [
-    `Directly verified within ${primaryDoc?.name || 'corpus'}: Analysis affirms empirical methodology and operational metrics.`,
-    `Cross-document consistency observed across ${attachedDocs.length} attached document source${attachedDocs.length > 1 ? 's' : ''}.`,
-    `Infrastructure benchmark GAIA-v2 and throughput targets align with documented specifications.`,
+    `Đã kiểm chứng trực tiếp từ ${primaryDoc?.name || 'tài liệu'}: Phân tích xác nhận tính chính xác của phương pháp luận và các chỉ số hoạt động.`,
+    `Tính nhất quán của dữ liệu được đảm bảo trên ${attachedDocs.length} tài liệu đính kèm.`,
+    `Các chỉ tiêu thực nghiệm và thông số kỹ thuật cốt lõi khớp với quy chuẩn công bố trong tài liệu.`,
   ];
 
   const risks: ResearchResponse['risks'] = [
     {
-      title: 'Context window saturation & inference latency',
-      description: 'Extensive multi-hop reasoning over large unstructured technical sections may increase token overhead and latency.',
+      title: 'Bão hòa cửa sổ ngữ cảnh và độ trễ suy luận',
+      description: 'Quá trình suy luận đa bước trên các tài liệu dài có thể làm tăng chi phí tính toán và thời gian phản hồi.',
       severity: 'medium',
     },
     {
-      title: 'Data variance across unaligned document revisions',
-      description: 'Discrepancies in benchmark reporting between technical memorandums and quarter-end balance sheets require normalization.',
+      title: 'Độ lệch số liệu giữa các phiên bản tài liệu',
+      description: 'Sự khác biệt về cách trình bày giữa các bản ghi chép kỹ thuật cần được chuẩn hóa trước khi đưa ra quyết định.',
       severity: 'low',
     },
   ];
 
-  if (lowerQ.includes('risk') || lowerQ.includes('danger') || lowerQ.includes('nguy cơ') || lowerQ.includes('rủi ro')) {
+  if (lowerQ.includes('risk') || lowerQ.includes('nguy cơ') || lowerQ.includes('rủi ro') || lowerQ.includes('danger')) {
     risks.unshift({
-      title: 'Quantization drift in sparse attention kernels',
-      description: 'Aggressive sub-4-bit weight quantization risks precision loss on non-linear activation sequences.',
+      title: 'Độ trôi lượng tử hóa trong mô hình thưa',
+      description: 'Việc nén trọng số sâu dưới 4-bit có nguy cơ làm suy giảm độ chính xác trên các chuỗi kích hoạt phi tuyến tính.',
       severity: 'high',
     });
   }
 
   const actions: ResearchResponse['actions'] = [
     {
-      title: 'Validate assumptions against primary source datasets',
-      description: 'Cross-reference experimental figures with baseline datasets reported in section 3 of the documents.',
+      title: 'Xác minh các giả định đối chiếu với dữ liệu gốc',
+      description: 'Đối chiếu lại các số liệu thử nghiệm với bảng tham chiếu ở phần 3 của tài liệu.',
     },
     {
-      title: 'Implement continuous evaluation on speculative decoding nodes',
-      description: 'Deploy real-time telemetry to track token generation throughput and latency improvements.',
+      title: 'Triển khai giám sát liên tục trên các nút tính toán',
+      description: 'Theo dõi độ trễ và lưu lượng tạo mã thông báo theo thời gian thực để đảm bảo hiệu suất.',
     },
   ];
 
@@ -133,26 +133,26 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { documentIds = [], message, conversationId } = body;
 
-    // 1. Validation - empty question (Section XXX)
+    // 1. Kiểm tra câu hỏi rỗng
     if (!message || typeof message !== 'string' || message.trim() === '') {
       return NextResponse.json(
-        { success: false, error: 'Question message cannot be empty.' },
+        { success: false, error: 'Câu hỏi không được để trống.' },
         { status: 400 }
       );
     }
 
-    // 2. Edge Case - No document selected (Section XXXI)
+    // 2. Kiểm tra chưa chọn tài liệu
     if (!Array.isArray(documentIds) || documentIds.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Upload at least one document to start research.',
+          error: 'Tải lên ít nhất một tài liệu để bắt đầu nghiên cứu.',
         },
         { status: 400 }
       );
     }
 
-    // 3. Fetch selected documents from PostgreSQL via Prisma
+    // 3. Lấy dữ liệu tài liệu từ PostgreSQL qua Prisma
     let attachedDocs: Array<{ id: string; name: string; content: string }> = [];
 
     try {
@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
       console.warn('Prisma document lookup fallback notice:', dbErr);
     }
 
-    // Fallback to shared corpus cache if DB unavailable
+    // Fallback sang bộ nhớ đệm nếu database offline
     if (attachedDocs.length === 0) {
       const sharedDocs = getSharedDocuments();
       attachedDocs = sharedDocs
@@ -183,30 +183,30 @@ export async function POST(req: NextRequest) {
         }));
     }
 
-    // If still no documents found
+    // Nếu vẫn không tìm thấy tài liệu
     if (attachedDocs.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: 'The selected documents were not found in the workspace.',
+          error: 'Không tìm thấy các tài liệu đã chọn trong không gian làm việc.',
         },
         { status: 404 }
       );
     }
 
-    // 4. Edge Case - Document contains no readable text (Section XXXII)
+    // 4. Kiểm tra tài liệu không có văn bản đọc được
     const hasReadableText = attachedDocs.some((d) => d.content && d.content.length > 0);
     if (!hasReadableText) {
       return NextResponse.json(
         {
           success: false,
-          error: 'This document does not contain readable text.',
+          error: 'Tài liệu này không chứa văn bản đọc được.',
         },
         { status: 400 }
       );
     }
 
-    // Ensure active conversation ID exists
+    // Đảm bảo conversation ID hợp lệ
     let activeConvId = conversationId;
     if (!activeConvId) {
       activeConvId = `conv-${Date.now()}`;
@@ -229,10 +229,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 5. Build Document Context & System Prompt
+    // 5. Xây dựng prompt ngữ cảnh tài liệu
     const prompt = buildDocumentContextPrompt(message.trim(), attachedDocs);
 
-    // 6. Real-time Streaming Response Pipeline
+    // 6. Xử lý đường truyền Real-time Streaming
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
 
         try {
           if (hasOpenAiKey()) {
-            // Live real-time stream using OpenAI API through Vercel AI SDK
+            // Live stream từ OpenAI qua Vercel AI SDK
             const result = streamText({
               model: openai(DEFAULT_MODEL),
               system: DAY2_SYSTEM_PROMPT,
@@ -257,10 +257,10 @@ export async function POST(req: NextRequest) {
               );
             }
 
-            // Parse and validate structured output
+            // Phân tích và kiểm thực JSON
             structuredResult = safeParseResearchResponse(fullText);
           } else {
-            // High-fidelity deterministic grounded streaming simulation
+            // Cơ chế mô phỏng stream có căn cứ tài liệu chính xác
             const deterministic = buildDeterministicStructuredResponse(
               message.trim(),
               attachedDocs
@@ -268,7 +268,6 @@ export async function POST(req: NextRequest) {
             structuredResult = deterministic;
             const jsonString = JSON.stringify(deterministic, null, 2);
 
-            // Stream in realistic micro-chunks to demonstrate real streaming UI
             const words = jsonString.split(/(\s+)/);
             for (let i = 0; i < words.length; i++) {
               const word = words[i];
@@ -282,7 +281,7 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // Fallback if structured parsing returned null
+          // Fallback nếu JSON không hợp lệ
           if (!structuredResult) {
             structuredResult = buildDeterministicStructuredResponse(
               message.trim(),
@@ -293,16 +292,15 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // Validate and map source IDs to avoid hallucinations (Section XXVII)
+          // Ánh xạ nguồn trích dẫn
           structuredResult.sources = validateAndMapSources(
             structuredResult.sources,
             attachedDocs
           );
 
-          // 7. Persist to database & update conversation title (Section XIV, XV, XLI)
+          // 7. Lưu trữ vào cơ sở dữ liệu và cập nhật tiêu đề cuộc trò chuyện
           if (activeConvId) {
             try {
-              // Auto-title conversation on first message
               const conv = await prisma.conversation.findUnique({
                 where: { id: activeConvId },
                 include: { messages: true },
@@ -310,7 +308,8 @@ export async function POST(req: NextRequest) {
               if (
                 conv &&
                 (conv.title === 'New Research Chat' ||
-                  conv.title === 'New Research' ||
+                  conv.title === 'Nghiên cứu mới' ||
+                  conv.title === 'Cuộc trò chuyện mới' ||
                   conv.messages.length === 0)
               ) {
                 await prisma.conversation.update({
@@ -322,7 +321,7 @@ export async function POST(req: NextRequest) {
                 });
               }
 
-              // Save User message
+              // Lưu tin nhắn người dùng
               await prisma.message.create({
                 data: {
                   conversationId: activeConvId,
@@ -331,7 +330,7 @@ export async function POST(req: NextRequest) {
                 },
               });
 
-              // Save Assistant message with structured JSON
+              // Lưu phản hồi trợ lý
               await prisma.message.create({
                 data: {
                   conversationId: activeConvId,
@@ -360,7 +359,7 @@ export async function POST(req: NextRequest) {
               updateSharedConversation(activeConvId, (c) => ({
                 ...c,
                 title:
-                  c.title === 'New Research Chat' || c.title === 'New Research'
+                  c.title === 'New Research Chat' || c.title === 'Nghiên cứu mới'
                     ? cleanTitle(message)
                     : c.title,
                 updatedAt: new Date().toISOString(),
@@ -368,7 +367,7 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // Send final completion packet
+          // Gửi sự kiện hoàn tất
           controller.enqueue(
             encoder.encode(
               JSON.stringify({
@@ -388,7 +387,7 @@ export async function POST(req: NextRequest) {
                 error:
                   streamError instanceof Error
                     ? streamError.message
-                    : 'Stream synthesis interrupted.',
+                    : 'Quá trình tổng hợp câu trả lời bị ngắt quãng.',
               }) + '\n'
             )
           );
@@ -410,7 +409,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Internal research chat error.',
+        error: error instanceof Error ? error.message : 'Lỗi hệ thống nghiên cứu AI.',
       },
       { status: 500 }
     );

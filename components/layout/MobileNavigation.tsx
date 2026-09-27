@@ -37,7 +37,7 @@ export function MobileNavigation({ isOpen, onClose, children }: MobileNavigation
         <button
           onClick={onClose}
           className="absolute right-3 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-foreground hover:bg-muted transition-colors cursor-pointer"
-          title="Close Navigation"
+          title="Đóng điều hướng"
           type="button"
         >
           <X className="w-4 h-4" />

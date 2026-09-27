@@ -51,7 +51,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const title = body.title || 'New Research Chat';
+    const title = body.title || 'Cuộc trò chuyện mới';
     const documentIds: string[] = Array.isArray(body.documentIds) ? body.documentIds : [];
 
     try {
