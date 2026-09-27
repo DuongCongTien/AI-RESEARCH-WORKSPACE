@@ -1,65 +1,78 @@
 'use client';
 
 import React from 'react';
-
-interface SourceItem {
-  documentId: string;
-  documentName: string;
-  page?: number;
-  excerpt?: string;
-}
+import { BookOpen, FileText, Quote } from 'lucide-react';
+import { ResearchSource } from '@/types/research';
 
 interface SourcesCardProps {
-  sources?: SourceItem[];
+  sources?: ResearchSource[];
 }
 
 export function SourcesCard({ sources = [] }: SourcesCardProps) {
-  if (!sources || sources.length === 0) return null;
+  const validSources = sources.filter((s) => s && (s.documentName || s.documentId));
 
   return (
-    <div className="rounded-2xl border border-outline-variant/60 bg-surface p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-secondary/40 card-interactive">
-      <div className="flex items-center gap-2 pb-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/10 text-secondary border border-secondary/20">
-          <span className="material-symbols-outlined text-[18px]">menu_book</span>
+    <div className="rounded-2xl border border-border bg-surface p-5 shadow-xs transition-all duration-200 hover:shadow-md hover:border-border/80">
+      {/* Header */}
+      <div className="flex items-center gap-2.5 pb-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/10 text-secondary border border-secondary/20 shrink-0">
+          <BookOpen className="w-4 h-4" />
         </div>
-        <h4 className="font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface">
-          Referenced Sources &amp; Citations ({sources.length})
+        <h4 className="font-semibold text-sm sm:text-base tracking-tight text-foreground">
+          Sources
         </h4>
+        {validSources.length > 0 && (
+          <span className="text-xs text-muted-foreground ml-auto font-mono">
+            {validSources.length} citation{validSources.length > 1 ? 's' : ''}
+          </span>
+        )}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-1">
-        {sources.map((src, index) => (
-          <div
-            key={index}
-            className="rounded-xl border border-outline-variant/40 bg-surface-container-low p-3.5 transition-all shadow-2xs hover:bg-surface hover:border-secondary/30"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="material-symbols-outlined text-[16px] shrink-0 text-secondary">
-                  description
-                </span>
-                <span className="text-body-sm font-bold text-on-surface truncate">
-                  {src.documentName}
-                </span>
-              </div>
-              {src.page && (
-                <span className="shrink-0 rounded-md bg-surface-container-high px-2 py-0.5 font-label-xs text-label-xs text-on-surface-variant font-mono border border-outline-variant/40">
-                  Page {src.page}
-                </span>
-              )}
-            </div>
+      {/* Citations or Empty State */}
+      {validSources.length === 0 ? (
+        <div className="flex items-center gap-2 rounded-xl border border-dashed border-border/70 bg-muted/30 p-3.5 text-xs text-muted-foreground">
+          <FileText className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+          <span>No sources available.</span>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {validSources.map((src, index) => {
+            const hasPage = typeof src.page === 'number' && !isNaN(src.page) && src.page > 0;
 
-            {src.excerpt && (
-              <div className="mt-2.5 flex items-start gap-2 rounded-lg bg-surface p-2.5 text-xs text-on-surface-variant border border-outline-variant/30 font-mono">
-                <span className="material-symbols-outlined text-[14px] shrink-0 text-secondary mt-0.5">
-                  format_quote
-                </span>
-                <p className="italic leading-relaxed">{src.excerpt}</p>
+            return (
+              <div
+                key={index}
+                className="rounded-xl border border-border/60 bg-surface-container-low/40 p-3.5 transition-all shadow-2xs hover:bg-surface hover:border-secondary/30"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="w-4 h-4 shrink-0 text-secondary" />
+                    <span className="text-xs font-semibold text-foreground truncate">
+                      {src.documentName}
+                    </span>
+                  </div>
+
+                  {/* Strictly omit if page is undefined/empty */}
+                  {hasPage && (
+                    <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 font-mono text-[11px] font-medium text-foreground border border-border">
+                      Page {src.page}
+                    </span>
+                  )}
+                </div>
+
+                {src.excerpt && (
+                  <div className="mt-2.5 flex items-start gap-2 rounded-lg bg-surface/80 p-2.5 text-xs text-muted-foreground border border-border/50">
+                    <Quote className="w-3.5 h-3.5 shrink-0 text-secondary/70 mt-0.5" />
+                    <p className="italic leading-relaxed font-serif text-[12px]">
+                      &ldquo;{src.excerpt}&rdquo;
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

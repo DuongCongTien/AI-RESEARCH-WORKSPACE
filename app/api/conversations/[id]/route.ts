@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
+import {
+  getSharedConversationById,
+  deleteSharedConversation,
+  updateSharedConversation,
+} from '@/lib/conversations/cache';
+import { safeParseResearchResponse } from '@/types/research';
 
 export async function GET(
   req: NextRequest,
@@ -14,30 +20,91 @@ export async function GET(
           messages: {
             orderBy: { createdAt: 'asc' },
           },
+          conversationDocuments: {
+            include: { document: true },
+          },
         },
       });
 
       if (conv) {
-        return NextResponse.json({ success: true, data: conv });
+        return NextResponse.json({
+          success: true,
+          data: {
+            id: conv.id,
+            title: conv.title,
+            createdAt: conv.createdAt.toISOString(),
+            updatedAt: conv.updatedAt.toISOString(),
+            documentIds: conv.conversationDocuments?.map((cd) => cd.documentId) || [],
+            messages: conv.messages.map((m) => ({
+              id: m.id,
+              conversationId: m.conversationId,
+              role: m.role as 'user' | 'assistant' | 'system',
+              content: m.content,
+              structuredResponse: safeParseResearchResponse(m.structuredData),
+              createdAt: m.createdAt.toISOString(),
+            })),
+          },
+        });
       }
-    } catch {
-      // DB error fallback
+    } catch (dbErr) {
+      console.warn('Prisma conversation by ID fetch warning:', dbErr);
     }
 
-    // Default mock conversation if not in DB
-    return NextResponse.json({
-      success: true,
-      data: {
-        id,
-        title: id === 'conv-1' ? 'Quantum Error Mitigation' : id === 'conv-2' ? 'Multi-agent consensus check' : 'Research Inquiry',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        messages: [],
-      },
-    });
+    // Check shared memory store
+    const cached = getSharedConversationById(id);
+    if (cached) {
+      return NextResponse.json({ success: true, data: cached });
+    }
+
+    // Create transient instance if not found
+    const transient = {
+      id,
+      title: 'New Research Chat',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      messages: [],
+      documentIds: [],
+    };
+
+    return NextResponse.json({ success: true, data: transient });
   } catch (err) {
     return NextResponse.json(
       { success: false, error: err instanceof Error ? err.message : 'Database error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await req.json().catch(() => ({}));
+    const { title } = body;
+
+    try {
+      const updated = await prisma.conversation.update({
+        where: { id },
+        data: {
+          title: title || undefined,
+          updatedAt: new Date(),
+        },
+      });
+      return NextResponse.json({ success: true, data: updated });
+    } catch {
+      // Memory store fallback
+      const updated = updateSharedConversation(id, (c) => ({
+        ...c,
+        title: title || c.title,
+        updatedAt: new Date().toISOString(),
+      }));
+      return NextResponse.json({ success: true, data: updated });
+    }
+  } catch (err) {
+    return NextResponse.json(
+      { success: false, error: err instanceof Error ? err.message : 'Update error' },
       { status: 500 }
     );
   }
@@ -54,6 +121,7 @@ export async function DELETE(
     } catch {
       // Ignore if not present in DB
     }
+    deleteSharedConversation(id);
     return NextResponse.json({ success: true, message: 'Conversation deleted' });
   } catch (err) {
     return NextResponse.json(

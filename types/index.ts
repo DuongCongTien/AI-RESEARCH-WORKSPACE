@@ -61,18 +61,18 @@ export interface ChatMessage {
   conversationId?: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  status?: 'idle' | 'loading' | 'success' | 'error';
+  structuredResponse?: import('./research').ResearchResponse | null;
+  status?: 'idle' | 'loading' | 'streaming' | 'success' | 'error';
   sources?: Array<{
     id: string;
     name: string;
     excerpt?: string;
+    page?: number;
   }>;
   createdAt: string | Date;
 }
 
-export type MessageItemType = ChatMessage & {
-  structuredResponse?: import('./research').ResearchResponse | null;
-};
+export type MessageItemType = ChatMessage;
 
 export interface ChatRequest {
   documentIds: string[];

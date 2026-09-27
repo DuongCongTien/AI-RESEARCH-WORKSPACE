@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Copy, Check, FileText } from 'lucide-react';
 
 interface SummaryCardProps {
   summary: string;
@@ -10,34 +11,47 @@ export function SummaryCard({ summary }: SummaryCardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
+    if (!summary) return;
     navigator.clipboard.writeText(summary);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-surface p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/50 card-interactive">
+    <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-surface p-5 shadow-xs transition-all duration-200 hover:shadow-md hover:border-primary/40">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-tertiary to-secondary" />
+
+      {/* Header */}
       <div className="flex items-center justify-between gap-2 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-            <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
+            <FileText className="w-4 h-4" />
           </div>
-          <h4 className="font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface">
-            Executive Summary
+          <h4 className="font-semibold text-sm sm:text-base tracking-tight text-foreground">
+            Summary
           </h4>
         </div>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-outline-variant/50 bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all active:scale-95 shadow-2xs"
-          title="Copy summary"
-        >
-          <span className="material-symbols-outlined text-[16px]">{copied ? 'done' : 'content_copy'}</span>
-        </button>
+
+        {summary && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface hover:bg-muted text-muted-foreground hover:text-foreground transition-all active:scale-95 shadow-2xs"
+            title="Copy summary"
+            aria-label="Copy summary"
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
+          </button>
+        )}
       </div>
-      <p className="text-body-md font-body-md leading-relaxed text-on-surface whitespace-pre-line">
-        {summary}
+
+      {/* Content */}
+      <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+        {summary || 'No summary available.'}
       </p>
     </div>
   );

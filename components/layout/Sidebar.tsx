@@ -38,21 +38,38 @@ export function Sidebar({
     { id: 'doc-3', name: 'BioMed_KG_Entity_Map', status: 'ready', fileType: 'graph' },
   ];
 
-  // Default mock conversations if none passed
   const displayConvs = conversations.length > 0 ? conversations : [
-    { id: 'conv-1', title: 'Quantum Error Mitigation', updatedAt: '12m' },
-    { id: 'conv-2', title: 'Multi-agent consensus check', updatedAt: '2h' },
-    { id: 'conv-3', title: 'Latent Space Optimization', updatedAt: '1d' },
+    { id: 'conv-1', title: 'Transformer Architecture Analysis', updatedAt: '30m ago' },
   ];
 
   const handleNewChat = () => {
     if (onNewConversation) {
       onNewConversation();
     } else {
-      router.push('/research');
+      router.push('/research?new=true');
     }
     if (onCloseMobileDrawer) onCloseMobileDrawer();
   };
+
+  function formatRelativeTime(dateInput: string | Date | undefined): string {
+    if (!dateInput) return '';
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    if (isNaN(date.getTime())) return String(dateInput);
+
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHour < 24) return `${diffHour}h ago`;
+    if (diffDay === 1) return 'Yesterday';
+    if (diffDay < 7) return `${diffDay}d ago`;
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
 
   return (
     <aside className="h-full w-72 bg-surface border-r border-outline-variant/60 flex flex-col justify-between select-none shadow-[1px_0_3px_0_rgba(0,0,0,0.02)] transition-colors">
@@ -203,26 +220,35 @@ export function Sidebar({
               Recent Conversations
             </span>
             <nav className="space-y-1">
-              {displayConvs.slice(0, 6).map((conv) => (
-                <Link
-                  key={conv.id}
-                  href={`/research/${conv.id}`}
-                  onClick={onCloseMobileDrawer}
-                  className="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150 group"
-                >
-                  <div className="flex items-center gap-space-sm truncate pr-2">
-                    <span className="material-symbols-outlined text-[16px] text-outline group-hover:text-primary transition-colors">
-                      chat_bubble
+              {displayConvs.slice(0, 8).map((conv) => {
+                const isActive = pathname === `/research/${conv.id}`;
+                return (
+                  <Link
+                    key={conv.id}
+                    href={`/research/${conv.id}`}
+                    onClick={onCloseMobileDrawer}
+                    className={`flex items-center justify-between px-space-sm py-1.5 rounded-lg text-body-sm transition-all duration-150 group ${
+                      isActive
+                        ? 'bg-primary/10 text-primary font-semibold border border-primary/20 shadow-xs'
+                        : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-space-sm truncate pr-2">
+                      <span
+                        className={`material-symbols-outlined text-[16px] transition-colors ${
+                          isActive ? 'text-primary' : 'text-outline group-hover:text-primary'
+                        }`}
+                      >
+                        chat_bubble
+                      </span>
+                      <span className="truncate">{conv.title}</span>
+                    </div>
+                    <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
+                      {formatRelativeTime(conv.updatedAt)}
                     </span>
-                    <span className="font-body-sm text-body-sm truncate">{conv.title}</span>
-                  </div>
-                  <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
-                    {typeof conv.updatedAt === 'string'
-                      ? conv.updatedAt
-                      : new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         </div>
