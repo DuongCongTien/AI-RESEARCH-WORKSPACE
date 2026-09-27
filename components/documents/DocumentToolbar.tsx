@@ -21,7 +21,7 @@ export function DocumentToolbar({
   onRemoveSelected,
   onToggleContextAll,
   embeddingModel = 'text-embedding-3-large',
-  tokensIndexed = 42190,
+  tokensIndexed = 0,
 }: DocumentToolbarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-space-sm pt-2">

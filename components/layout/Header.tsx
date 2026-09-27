@@ -144,11 +144,11 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
             title="Hồ sơ tài khoản"
           >
             <div className="w-8 h-8 rounded-full border border-outline-variant/60 overflow-hidden bg-primary-container text-primary font-bold text-xs flex items-center justify-center shadow-xs group-hover:ring-2 group-hover:ring-primary/30 transition-all">
-              EV
+              AI
             </div>
             <div className="hidden xl:flex flex-col text-left">
-              <span className="font-body-sm text-body-sm leading-none font-semibold text-on-surface">TS. Elena Vance</span>
-              <span className="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Nghiên cứu viên trưởng</span>
+              <span className="font-body-sm text-body-sm leading-none font-semibold text-on-surface">Người dùng</span>
+              <span className="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Không gian nghiên cứu</span>
             </div>
           </Link>
         </div>

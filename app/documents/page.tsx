@@ -10,98 +10,19 @@ import { DocumentPreviewDrawer } from '@/components/documents/DocumentPreviewDra
 import { UploadDialog } from '@/components/documents/UploadDialog';
 import { DocumentItem } from '@/types';
 
-// Default mock initial documents that match the exact HTML specification if database is empty
-const INITIAL_DEMO_DOCUMENTS: DocumentItem[] = [
-  {
-    id: 'doc-annual-report',
-    name: 'Bao_Cao_Thuong_Nien.pdf',
-    fileType: 'pdf',
-    fileSize: 2.4 * 1024 * 1024,
-    pages: 15,
-    wordCount: 12450,
-    indexHealth: 98.4,
-    status: 'ready',
-    inContext: true,
-    uploadedBy: 'TS. Elena Vance',
-    uploadedAt: 'hôm nay lúc 09:42',
-    tablesCount: 4,
-    chunksCount: 15,
-    tokensCount: 42190,
-    embeddingModel: 'text-embedding-3-large',
-    textContent:
-      'Trong năm tài chính 2024, hoạt động hạ tầng học sâu mở rộng 34.2% so với cùng kỳ. Cụm nghiên cứu đạt thông lượng suy luận tăng 2.1x sau khi triển khai các bộ giải mã nâng cao.',
-    parsedMarkdown:
-      '# 1. Tóm tắt nội dung & Điểm mốc chính\n\nTrong năm tài chính 2024, hoạt động hạ tầng học sâu mở rộng **34.2% so với cùng kỳ**. Cụm nghiên cứu đạt thông lượng suy luận tăng 2.1x sau khi triển khai các bộ giải mã nâng cao.\n\nThước đo tự chủ tác nhân **GAIA-v2** ghi nhận độ chính xác tăng từ 61.8% lên 74.3% trên các tác vụ truy hồi công cụ.',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-market-analysis',
-    name: 'Phan_Tich_Thi_Truong.docx',
-    fileType: 'docx',
-    fileSize: 1.8 * 1024 * 1024,
-    pages: 28,
-    wordCount: 18200,
-    indexHealth: 88.0,
-    status: 'processing',
-    progress: 42,
-    step: 'Đang trích xuất văn bản & bảng biểu... (Đoạn 18/42)',
-    timeRemaining: 'Dự kiến 20 giây',
-    inContext: true,
-    uploadedBy: 'TS. Elena Vance',
-    uploadedAt: '4 phút trước',
-    tablesCount: 2,
-    chunksCount: 8,
-    tokensCount: 14500,
-    embeddingModel: 'Cohere-Embed-v3',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-technical-notes',
-    name: 'Ghi_Chu_Ky_Thuat.txt',
-    fileType: 'txt',
-    fileSize: 420 * 1024,
-    pages: 4,
-    wordCount: 3120,
-    indexHealth: 95.0,
-    status: 'uploading',
-    progress: 65,
-    transferRate: '1.2 MB/s',
-    timeRemaining: 'Còn ~2 giây',
-    inContext: true,
-    uploadedBy: 'TS. Elena Vance',
-    uploadedAt: 'Đang tải lên từ thiết bị',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-corrupted-data',
-    name: 'Tep_Loi_Du_Lieu.pdf',
-    fileType: 'pdf',
-    fileSize: 512 * 1024,
-    pages: 0,
-    wordCount: 0,
-    indexHealth: 0,
-    status: 'failed',
-    errorMsg: 'Phân tích tiêu đề thất bại (magic byte không hợp lệ)',
-    errorCode: 'ERR_PDF_MAGIC_0x00',
-    inContext: false,
-    uploadedBy: 'TS. Elena Vance',
-    uploadedAt: 'Quá trình nạp dừng 14 phút trước',
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<DocumentItem[]>(INITIAL_DEMO_DOCUMENTS);
-  const [selectedIds, setSelectedIds] = useState<string[]>(['doc-annual-report', 'doc-market-analysis', 'doc-technical-notes']);
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
-  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(INITIAL_DEMO_DOCUMENTS[0]);
+  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Fetch documents from backend on mount
   useEffect(() => {
@@ -110,14 +31,16 @@ export default function DocumentsPage() {
         const res = await fetch('/api/documents');
         if (res.ok) {
           const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          if (json.success && Array.isArray(json.data)) {
             setDocuments(json.data);
             setSelectedIds(json.data.map((d: DocumentItem) => d.id));
-            setPreviewDoc(json.data[0]);
+            if (json.data.length > 0) setPreviewDoc(json.data[0]);
           }
         }
       } catch (err) {
-        console.warn('Using default demo corpus data:', err);
+        console.error('Failed to load documents:', err);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -127,7 +50,6 @@ export default function DocumentsPage() {
   // Filter and sort documents
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
-      // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesName = doc.name.toLowerCase().includes(q);
@@ -135,25 +57,17 @@ export default function DocumentsPage() {
         const matchesText = doc.textContent?.toLowerCase().includes(q);
         if (!matchesName && !matchesType && !matchesText) return false;
       }
-
-      // Type Filter
       if (typeFilter !== 'all') {
         if (typeFilter === 'pdf' && !doc.fileType.toLowerCase().includes('pdf')) return false;
         if (typeFilter === 'docx' && !doc.fileType.toLowerCase().includes('doc')) return false;
         if (typeFilter === 'txt' && !doc.fileType.toLowerCase().includes('txt')) return false;
       }
-
-      // Status Filter
-      if (statusFilter !== 'all' && doc.status !== statusFilter) {
-        return false;
-      }
-
+      if (statusFilter !== 'all' && doc.status !== statusFilter) return false;
       return true;
     }).sort((a, b) => {
       if (sortBy === 'size') return (b.fileSize || 0) - (a.fileSize || 0);
       if (sortBy === 'quality') return (b.indexHealth || 0) - (a.indexHealth || 0);
       if (sortBy === 'title') return a.name.localeCompare(b.name);
-      // default: date
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [documents, searchQuery, typeFilter, statusFilter, sortBy]);
@@ -215,9 +129,10 @@ export default function DocumentsPage() {
   const handleSyncVectorStore = async () => {
     setIsSyncing(true);
     setSyncFeedback('Đang đồng bộ hóa dữ liệu nhúng với cơ sở dữ liệu véc-tơ...');
+    const totalTokens = documents.reduce((sum, d) => sum + (d.tokensCount || 0), 0);
     setTimeout(() => {
       setIsSyncing(false);
-      setSyncFeedback('Kho lưu trữ véc-tơ đã đồng bộ. 42,190 token đã làm mới.');
+      setSyncFeedback(`Kho lưu trữ véc-tơ đã đồng bộ. ${totalTokens.toLocaleString()} token đã làm mới.`);
       setTimeout(() => setSyncFeedback(null), 4000);
     }, 1500);
   };
@@ -247,9 +162,6 @@ export default function DocumentsPage() {
               ...d,
               status: 'ready',
               progress: 100,
-              pages: 12,
-              wordCount: 8400,
-              indexHealth: 96.5,
               step: 'Đã hoàn thành',
             };
           }
@@ -358,30 +270,47 @@ export default function DocumentsPage() {
               onRemoveSelected={handleRemoveSelected}
               onToggleContextAll={handleToggleContextAll}
               embeddingModel="text-embedding-3-large"
-              tokensIndexed={42190}
+              tokensIndexed={documents.reduce((sum, d) => sum + (d.tokensCount || 0), 0)}
             />
           </div>
 
           {/* CARDS GRID */}
           <div className="p-4 lg:p-space-xl flex-1 overflow-y-auto">
-            {filteredDocuments.length === 0 ? (
+            {loading ? (
+              <div className="h-64 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[32px] text-outline animate-spin">progress_activity</span>
+              </div>
+            ) : filteredDocuments.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-center p-8 bg-surface-container-low rounded-2xl border border-outline-variant/20">
-                <span className="material-symbols-outlined text-[48px] text-outline mb-2">find_in_page</span>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">Không tìm thấy tài liệu</h3>
+                <span className="material-symbols-outlined text-[48px] text-outline mb-2">
+                  {documents.length === 0 ? 'cloud_upload' : 'find_in_page'}
+                </span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                  {documents.length === 0 ? 'Chưa có tài liệu nào' : 'Không tìm thấy tài liệu'}
+                </h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm mt-1">
-                  Không có tài liệu nào khớp với tiêu chí lọc hoặc tìm kiếm. Hãy thử xóa bộ lọc hoặc tải tệp mới lên.
+                  {documents.length === 0
+                    ? 'Tải tài liệu lên để bắt đầu nghiên cứu.'
+                    : 'Không có tài liệu nào khớp với tiêu chí lọc. Hãy thử xóa bộ lọc.'}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setTypeFilter('all');
-                    setStatusFilter('all');
-                  }}
-                  className="mt-4 px-4 py-1.5 rounded-lg bg-surface-container-high text-primary text-xs hover:bg-surface-bright"
-                >
-                  Xóa bộ lọc
-                </button>
+                {documents.length === 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadOpen(true)}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary/90 transition-all shadow-xs cursor-pointer active:scale-95"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">cloud_upload</span>
+                    Tải tài liệu lên
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setSearchQuery(''); setTypeFilter('all'); setStatusFilter('all'); }}
+                    className="mt-4 px-4 py-1.5 rounded-lg bg-surface-container-high text-primary text-xs hover:bg-surface-bright"
+                  >
+                    Xóa bộ lọc
+                  </button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-space-lg">

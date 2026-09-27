@@ -59,7 +59,7 @@ export function DocumentCard({
                   </span>
                 </div>
                 <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                  Được tải lên {doc.uploadedAt || 'hôm nay lúc 09:42'} bởi {doc.uploadedBy || 'TS. Elena Vance'}
+                  {doc.uploadedAt ? `Được tải lên ${doc.uploadedAt}` : 'Vừa tải lên'}
                 </p>
               </div>
             </div>
@@ -86,18 +86,18 @@ export function DocumentCard({
             </div>
             <div>
               <span className="font-label-xs text-label-xs text-outline block">Số trang</span>
-              <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages || 15}</span>
+              <span className="font-label-md text-label-md text-on-surface font-semibold">{doc.pages ?? '—'}</span>
             </div>
             <div>
               <span className="font-label-xs text-label-xs text-outline block">Số từ</span>
               <span className="font-label-md text-label-md text-on-surface font-semibold">
-                {(doc.wordCount || 12450).toLocaleString()}
+                {doc.wordCount ? doc.wordCount.toLocaleString() : '—'}
               </span>
             </div>
             <div>
               <span className="font-label-xs text-label-xs text-outline block">Độ tin cậy chỉ mục</span>
               <span className="font-label-md text-label-md text-tertiary font-semibold">
-                {doc.indexHealth || 98.4}%
+                {doc.indexHealth ? `${doc.indexHealth}%` : '—'}
               </span>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function DocumentCard({
                   </span>
                 </div>
                 <p className="font-label-xs text-label-xs text-outline mt-0.5 truncate">
-                  Được tải lên {doc.uploadedAt || '4 phút trước'} bởi {doc.uploadedBy || 'TS. Elena Vance'}
+                  {doc.uploadedAt ? `Được tải lên ${doc.uploadedAt}` : 'Vừa tải lên'}
                 </p>
               </div>
             </div>

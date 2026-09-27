@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       errorMsg: processed.errorMsg,
       errorCode: processed.status === 'failed' ? 'ERR_PARSE_FAIL' : null,
       inContext: true,
-      uploadedBy: 'TS. Elena Vance',
+      uploadedBy: 'Người dùng',
       uploadedAt: 'Vừa xong',
       content: processed.textContent,
       textContent: processed.textContent,
