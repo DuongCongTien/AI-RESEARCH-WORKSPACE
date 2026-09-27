@@ -1,5 +1,15 @@
 export * from './research';
 
+export type DocumentStatus =
+  | 'uploading'
+  | 'processing'
+  | 'ready'
+  | 'failed'
+  | 'UPLOADING'
+  | 'PROCESSING'
+  | 'READY'
+  | 'FAILED';
+
 export interface DocumentChunk {
   id: string;
   chunkIndex: number;
@@ -8,25 +18,29 @@ export interface DocumentChunk {
   metadata?: Record<string, unknown>;
 }
 
-export interface DocumentItem {
+export interface Document {
   id: string;
   name: string;
+  fileName?: string | null;
   fileUrl?: string | null;
   fileType: string;
+  mimeType?: string | null;
   fileSize: number;
   pages?: number;
   wordCount?: number;
   indexHealth?: number;
-  status: 'uploading' | 'processing' | 'ready' | 'failed';
+  status: DocumentStatus;
   progress?: number;
-  step?: string;
-  transferRate?: string;
-  timeRemaining?: string;
+  step?: string | null;
+  transferRate?: string | null;
+  timeRemaining?: string | null;
   errorMsg?: string | null;
   errorCode?: string | null;
   inContext?: boolean;
-  uploadedBy?: string;
-  uploadedAt?: string;
+  uploadedBy?: string | null;
+  uploadedAt?: string | null;
+  userId?: string | null;
+  content?: string | null;
   textContent?: string | null;
   parsedMarkdown?: string | null;
   rawText?: string | null;
@@ -39,6 +53,45 @@ export interface DocumentItem {
   chunks?: DocumentChunk[];
 }
 
+// Alias for backwards compatibility
+export type DocumentItem = Document;
+
+export interface ChatMessage {
+  id: string;
+  conversationId?: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  status?: 'idle' | 'loading' | 'success' | 'error';
+  sources?: Array<{
+    id: string;
+    name: string;
+    excerpt?: string;
+  }>;
+  createdAt: string | Date;
+}
+
+export type MessageItemType = ChatMessage & {
+  structuredResponse?: import('./research').ResearchResponse | null;
+};
+
+export interface ChatRequest {
+  documentIds: string[];
+  message: string;
+  conversationId?: string;
+}
+
+export interface ChatResponse {
+  success: boolean;
+  message?: string;
+  answer?: string;
+  sources?: Array<{
+    id: string;
+    name: string;
+    excerpt?: string;
+  }>;
+  error?: string;
+}
+
 export interface ConversationItem {
   id: string;
   title: string;
@@ -46,13 +99,4 @@ export interface ConversationItem {
   updatedAt: string | Date;
   messages?: MessageItemType[];
   documentIds?: string[];
-}
-
-export interface MessageItemType {
-  id: string;
-  conversationId: string;
-  role: 'user' | 'assistant';
-  content: string;
-  structuredResponse?: import('./research').ResearchResponse | null;
-  createdAt: string | Date;
 }

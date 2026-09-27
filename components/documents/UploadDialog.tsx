@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { DocumentItem } from '@/types';
+import { UploadProgress } from './UploadProgress';
 
 interface UploadDialogProps {
   isOpen: boolean;
@@ -11,8 +12,9 @@ interface UploadDialogProps {
 
 export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'ready' | 'failed'>('idle');
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [stepMessage, setStepMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +29,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
 
   const validateAndSetFile = (selected: File) => {
     setErrorMessage(null);
+    setUploadStatus('idle');
     const maxSizeBytes = 25 * 1024 * 1024; // 25MB limit
     if (selected.size > maxSizeBytes) {
       setErrorMessage('File size exceeds the 25MB maximum limit.');
@@ -59,21 +62,28 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
   const handleUploadSubmit = async () => {
     if (!file) return;
 
-    setIsUploading(true);
-    setUploadProgress(20);
+    setUploadStatus('uploading');
+    setUploadProgress(25);
+    setStepMessage('Uploading document payload...');
     setErrorMessage(null);
 
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      setUploadProgress(45);
+      // Simulate progressive network telemetry
+      await new Promise((r) => setTimeout(r, 200));
+      setUploadProgress(65);
+      setUploadStatus('processing');
+      setStepMessage('Extracting text and parsing document...');
+
       const res = await fetch('/api/documents', {
         method: 'POST',
         body: formData,
       });
 
-      setUploadProgress(85);
+      setUploadProgress(90);
+      setStepMessage('Indexing vectors & finalizing...');
       const json = await res.json();
 
       if (!res.ok || !json.success) {
@@ -81,14 +91,22 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
       }
 
       setUploadProgress(100);
-      onUploaded(json.data);
+      setUploadStatus('ready');
+      setStepMessage('Document processed successfully!');
+
+      setTimeout(() => {
+        onUploaded(json.data);
+      }, 700);
     } catch (err) {
       console.error('Upload error:', err);
-      setErrorMessage(err instanceof Error ? err.message : 'Upload failed. Please check network connection.');
-      setIsUploading(false);
+      const msg = err instanceof Error ? err.message : 'Upload failed. Please check network or file format.';
+      setErrorMessage(msg);
+      setUploadStatus('failed');
       setUploadProgress(0);
     }
   };
+
+  const isUploading = uploadStatus === 'uploading' || uploadStatus === 'processing';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in-up">
@@ -100,8 +118,12 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
               <span className="material-symbols-outlined text-[20px]">cloud_upload</span>
             </div>
             <div>
-              <span className="font-headline-sm text-headline-sm text-on-surface font-semibold block">Upload Research Document</span>
-              <span className="font-label-xs text-label-xs text-outline block">Auto OCR &amp; High-Dimension Embedding</span>
+              <span className="font-headline-sm text-headline-sm text-on-surface font-semibold block">
+                Upload Research Document
+              </span>
+              <span className="font-label-xs text-label-xs text-outline block">
+                Automatic OCR, Text Extraction &amp; Indexing
+              </span>
             </div>
           </div>
           <button
@@ -115,7 +137,7 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
         </div>
 
         {/* Error Alert */}
-        {errorMessage && (
+        {errorMessage && uploadStatus !== 'failed' && (
           <div className="p-3 bg-error-container/30 border border-error/30 rounded-xl flex items-start gap-2 text-error">
             <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">report_problem</span>
             <span className="text-body-sm font-body-sm leading-tight">{errorMessage}</span>
@@ -140,9 +162,13 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
             accept=".pdf,.docx,.txt,.json,.md"
             className="hidden"
           />
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform ${
-            file ? 'bg-primary text-on-primary scale-110 shadow-md' : 'bg-surface text-tertiary shadow-xs border border-outline-variant/40'
-          }`}>
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform ${
+              file
+                ? 'bg-primary text-on-primary scale-110 shadow-md'
+                : 'bg-surface text-tertiary shadow-xs border border-outline-variant/40'
+            }`}
+          >
             <span className="material-symbols-outlined text-[30px]">
               {file ? 'check_circle' : 'upload_file'}
             </span>
@@ -168,23 +194,16 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
           )}
         </div>
 
-        {/* Progress Bar when uploading */}
-        {isUploading && (
-          <div className="space-y-1.5 p-3 rounded-xl bg-surface-container-low border border-outline-variant/40">
-            <div className="flex justify-between font-label-xs text-label-xs text-on-surface-variant font-medium">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                Extracting and indexing text chunks...
-              </span>
-              <span className="text-primary font-mono font-semibold">{uploadProgress}%</span>
-            </div>
-            <div className="w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden relative">
-              <div
-                className="bg-primary h-full rounded-full transition-all duration-300 shimmer-sweep"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
-          </div>
+        {/* Upload & Ingestion Progress Component */}
+        {uploadStatus !== 'idle' && (
+          <UploadProgress
+            status={uploadStatus}
+            progress={uploadProgress}
+            fileName={file?.name}
+            stepMessage={stepMessage}
+            error={errorMessage}
+            onRetry={handleUploadSubmit}
+          />
         )}
 
         {/* Footer Actions */}
@@ -200,15 +219,23 @@ export function UploadDialog({ isOpen, onClose, onUploaded }: UploadDialogProps)
           <button
             type="button"
             onClick={handleUploadSubmit}
-            disabled={!file || isUploading}
+            disabled={!file || isUploading || uploadStatus === 'ready'}
             className={`inline-flex items-center gap-2 px-space-lg py-2.5 rounded-xl font-body-sm text-body-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer ${
-              file && !isUploading
+              file && !isUploading && uploadStatus !== 'ready'
                 ? 'bg-primary hover:bg-primary-fixed text-on-primary hover:shadow-lg'
                 : 'bg-surface-container-high text-outline cursor-not-allowed'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
-            {isUploading ? 'Ingesting...' : 'Start Ingestion'}
+            <span className="material-symbols-outlined text-[18px]">
+              {uploadStatus === 'ready' ? 'check' : 'cloud_upload'}
+            </span>
+            {uploadStatus === 'uploading'
+              ? 'Uploading...'
+              : uploadStatus === 'processing'
+                ? 'Processing...'
+                : uploadStatus === 'ready'
+                  ? 'Completed'
+                  : 'Start Ingestion'}
           </button>
         </div>
       </div>

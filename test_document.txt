@@ -1,0 +1,7 @@
+Artificial Intelligence in Healthcare:
+The primary finding of this trial indicates a 42% reduction in diagnostic delay for cardiovascular anomalies.
+Three critical risks were identified:
+1. Model bias towards specific demographic groups
+2. Latency exceeding 500ms on edge hospital nodes
+3. Lack of interoperability with legacy EHR databases.
+Recommended next steps include establishing federated calibration pipelines.

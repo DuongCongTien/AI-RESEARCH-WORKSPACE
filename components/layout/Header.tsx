@@ -22,15 +22,15 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   React.useEffect(() => {
-    // Default is light (white background) unless explicitly saved as dark
     const saved = localStorage.getItem('researchai_theme');
-    if (saved === 'dark') {
-      setIsDarkMode(true);
+    const shouldBeDark = saved === 'dark';
+    if (shouldBeDark) {
       document.documentElement.classList.add('dark');
     } else {
-      setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     }
+    const timer = setTimeout(() => setIsDarkMode(shouldBeDark), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleToggleTheme = () => {

@@ -23,6 +23,8 @@ model Document {
   name                  String
   fileUrl               String?
   fileType              String                 @default("pdf")
+  fileName              String?
+  mimeType              String?
   fileSize              Int                    @default(0)
   pages                 Int                    @default(1)
   wordCount             Int                    @default(0)
@@ -37,6 +39,7 @@ model Document {
   inContext             Boolean                @default(true)
   uploadedBy            String                 @default("Dr. Elena Vance")
   uploadedAt            String?
+  content               String?                @db.Text
   textContent           String?                @db.Text
   parsedMarkdown        String?                @db.Text
   rawText               String?                @db.Text

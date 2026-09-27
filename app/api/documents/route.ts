@@ -1,94 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
-import { parseDocument } from '@/lib/documents/parser';
-import { chunkText } from '@/lib/documents/chunker';
+import { prisma } from '@/lib/prisma';
+import { processDocumentFile, validateDocumentFile } from '@/lib/documents/processor';
 import { DocumentItem } from '@/types';
+import { getSharedDocuments, addSharedDocument, removeSharedDocument } from '@/lib/documents/cache';
 
-// In-memory fallback cache seeded with the exact HTML demo corpus
-let fallbackDocuments: DocumentItem[] = [
-  {
-    id: 'doc-annual-report',
-    name: 'Annual_Report.pdf',
-    fileType: 'pdf',
-    fileSize: 2.4 * 1024 * 1024,
-    pages: 15,
-    wordCount: 12450,
-    indexHealth: 98.4,
-    status: 'ready',
-    progress: 100,
-    inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'today at 09:42 AM',
-    tablesCount: 4,
-    chunksCount: 15,
-    tokensCount: 42190,
-    embeddingModel: 'text-embedding-3-large',
-    textContent:
-      'In fiscal year 2024, our deep learning infrastructure operations expanded by 34.2% Year-Over-Year. Core research clusters realized an overall inference throughput enhancement of 2.1x following the roll-out of speculative decoding kernels. Agent autonomy benchmark GAIA-v2 recorded an accuracy increase from 61.8% to 74.3% across tool retrieval tasks, corroborating hypotheses presented in Technical Memorandum #88.',
-    parsedMarkdown:
-      '# 1. Executive Summary & Q4 Milestones\n\nIn fiscal year 2024, our deep learning infrastructure operations expanded by **34.2% Year-Over-Year**. Core research clusters realized an overall inference throughput enhancement of 2.1x following the roll-out of speculative decoding kernels.\n\nAgent autonomy benchmark **GAIA-v2** recorded an accuracy increase from 61.8% to 74.3% across tool retrieval tasks, corroborating hypotheses presented in Technical Memorandum #88.\n\n### Table 1.1: Latency & Memory Allocation\n| Model Spec | VRAM | TTFT |\n|---|---|---|\n| Llama-3-70B-FP8 | 41.2 GB | 14.2 ms |\n| Mistral-Large-Q4 | 26.8 GB | 9.8 ms |',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-market-analysis',
-    name: 'Market_Analysis.docx',
-    fileType: 'docx',
-    fileSize: 1.8 * 1024 * 1024,
-    pages: 28,
-    wordCount: 18200,
-    indexHealth: 88.0,
-    status: 'processing',
-    progress: 42,
-    step: 'Extracting text & multi-column tables... (Chunk 18/42)',
-    timeRemaining: 'Est. 20s',
-    inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: '4 mins ago',
-    tablesCount: 2,
-    chunksCount: 8,
-    tokensCount: 14500,
-    embeddingModel: 'Cohere-Embed-v3',
-    textContent: 'Market analysis of sovereign AI compute nodes and foundational LLM hosting...',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-technical-notes',
-    name: 'Technical_Notes.txt',
-    fileType: 'txt',
-    fileSize: 420 * 1024,
-    pages: 4,
-    wordCount: 3120,
-    indexHealth: 95.0,
-    status: 'uploading',
-    progress: 65,
-    transferRate: '1.2 MB/s',
-    timeRemaining: '~2 seconds remaining',
-    inContext: true,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'Uploading from local storage',
-    tablesCount: 0,
-    chunksCount: 4,
-    tokensCount: 3120,
-    textContent: 'Technical specifications for distributed model quantization and sparse attention kernels.',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'doc-corrupted-data',
-    name: 'Corrupted_Data.pdf',
-    fileType: 'pdf',
-    fileSize: 512 * 1024,
-    pages: 0,
-    wordCount: 0,
-    indexHealth: 0,
-    status: 'failed',
-    errorMsg: 'Header parsing failed (invalid magic byte EOF)',
-    errorCode: 'ERR_PDF_MAGIC_0x00',
-    inContext: false,
-    uploadedBy: 'Dr. Elena Vance',
-    uploadedAt: 'Ingestion terminated 14 mins ago',
-    createdAt: new Date().toISOString(),
-  },
-];
 
 export async function GET(req: NextRequest) {
   try {
@@ -102,27 +17,29 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
       });
 
-      if (docs.length > 0) {
-        let results = docs.map((d) => ({
+      if (docs && docs.length > 0) {
+        let results: DocumentItem[] = docs.map((d) => ({
           ...d,
+          status: (d.status.toLowerCase() as DocumentItem['status']) || 'ready',
+          content: d.content || d.textContent || null,
           createdAt: d.createdAt.toISOString(),
           updatedAt: d.updatedAt.toISOString(),
         }));
 
         if (q) results = results.filter((d) => d.name.toLowerCase().includes(q));
         if (type && type !== 'all') results = results.filter((d) => d.fileType.toLowerCase().includes(type));
-        if (status && status !== 'all') results = results.filter((d) => d.status === status);
+        if (status && status !== 'all') results = results.filter((d) => d.status.toLowerCase() === status.toLowerCase());
 
         return NextResponse.json({ success: true, data: results });
       }
     } catch {
-      // Prisma error, fallback
+      // Prisma database connection not yet active, fallback gracefully
     }
 
-    let results = [...fallbackDocuments];
+    let results = [...getSharedDocuments()];
     if (q) results = results.filter((d) => d.name.toLowerCase().includes(q));
     if (type && type !== 'all') results = results.filter((d) => d.fileType.toLowerCase().includes(type));
-    if (status && status !== 'all') results = results.filter((d) => d.status === status);
+    if (status && status !== 'all') results = results.filter((d) => d.status.toLowerCase() === status.toLowerCase());
 
     return NextResponse.json({
       success: true,
@@ -145,75 +62,74 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = file.name;
-    const fileType = fileName.split('.').pop()?.toLowerCase() || 'txt';
     const fileSize = file.size;
 
-    // Parse text content
-    let parsedText = '';
-    let pageCount = 1;
-    let wordCount = 0;
-    let status: 'ready' | 'processing' | 'failed' = 'ready';
-    let errorMsg: string | null = null;
-
-    try {
-      const parsed = await parseDocument(buffer, file.type || fileType, fileName);
-      parsedText = parsed.text;
-      pageCount = parsed.pageCount || Math.max(1, Math.ceil(parsedText.length / 2500));
-      wordCount = parsed.wordCount || parsedText.split(/\s+/).filter(Boolean).length;
-    } catch (parseError) {
-      console.error('Error parsing file:', parseError);
-      status = 'failed';
-      errorMsg = parseError instanceof Error ? parseError.message : 'File parsing failed';
+    // Validate file type & size
+    const validation = validateDocumentFile(fileName, fileSize);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { success: false, error: validation.error || 'Invalid file format or size' },
+        { status: 400 }
+      );
     }
 
-    const chunks = chunkText(parsedText);
-    const tokensCount = Math.round(wordCount * 1.33);
+    const buffer = Buffer.from(await file.arrayBuffer());
 
+    // Process document through modular parser & chunker
+    const processed = await processDocumentFile(buffer, fileName, file.type);
+
+    const docId = `doc-${Date.now()}`;
     const newDoc: DocumentItem = {
-      id: `doc-${Date.now()}`,
+      id: docId,
       name: fileName,
-      fileType,
-      fileSize,
-      pages: pageCount,
-      wordCount,
-      indexHealth: status === 'ready' ? 98.4 : 0,
-      status,
-      progress: status === 'ready' ? 100 : 0,
-      step: status === 'ready' ? 'Indexed and vector embedded' : 'Failed during byte parsing',
-      errorMsg,
-      errorCode: status === 'failed' ? 'ERR_PARSE_FAIL' : null,
+      fileName,
+      fileType: processed.fileType,
+      mimeType: processed.mimeType,
+      fileSize: processed.fileSize,
+      pages: processed.pageCount,
+      wordCount: processed.wordCount,
+      indexHealth: processed.status === 'ready' ? 98.4 : 0,
+      status: processed.status,
+      progress: processed.status === 'ready' ? 100 : 0,
+      step: processed.status === 'ready' ? 'Indexed and vector embedded' : 'Failed during byte parsing',
+      errorMsg: processed.errorMsg,
+      errorCode: processed.status === 'failed' ? 'ERR_PARSE_FAIL' : null,
       inContext: true,
       uploadedBy: 'Dr. Elena Vance',
       uploadedAt: 'Just now',
-      textContent: parsedText,
-      parsedMarkdown: `# ${fileName}\n\n${parsedText.slice(0, 3000)}...`,
+      content: processed.textContent,
+      textContent: processed.textContent,
+      parsedMarkdown: processed.parsedMarkdown,
       tablesCount: 1,
-      chunksCount: chunks.length || 1,
-      tokensCount,
+      chunksCount: processed.chunks.length || 1,
+      tokensCount: processed.tokensCount,
       embeddingModel: 'text-embedding-3-large',
       createdAt: new Date().toISOString(),
     };
 
+    // Save to PostgreSQL via Prisma
     try {
       const created = await prisma.document.create({
         data: {
           name: fileName,
-          fileType,
-          fileSize,
-          pages: pageCount,
-          wordCount,
+          fileName,
+          fileType: processed.fileType,
+          mimeType: processed.mimeType,
+          fileSize: processed.fileSize,
+          pages: processed.pageCount,
+          wordCount: processed.wordCount,
           indexHealth: newDoc.indexHealth || 98.4,
-          status,
+          status: processed.status,
           progress: 100,
           inContext: true,
-          textContent: parsedText || null,
+          content: processed.textContent || null,
+          textContent: processed.textContent || null,
           parsedMarkdown: newDoc.parsedMarkdown,
-          tokensCount,
-          chunksCount: chunks.length,
+          tokensCount: processed.tokensCount,
+          chunksCount: processed.chunks.length,
           chunks: {
-            create: chunks.slice(0, 20).map((c) => ({
+            create: processed.chunks.slice(0, 20).map((c) => ({
               chunkIndex: c.index,
               content: c.content,
               relevance: c.relevance,
@@ -225,15 +141,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         data: {
-          ...created,
+          id: created.id,
+          name: created.name,
+          fileName: created.fileName || created.name,
+          type: created.mimeType || `application/${created.fileType}`,
+          fileType: created.fileType,
+          size: created.fileSize,
+          fileSize: created.fileSize,
+          status: created.status,
+          wordCount: created.wordCount,
+          pages: created.pages,
           createdAt: created.createdAt.toISOString(),
           updatedAt: created.updatedAt.toISOString(),
         },
       });
     } catch (dbError) {
-      console.warn('Prisma DB write failed, saving to fallback cache:', dbError);
-      fallbackDocuments.unshift(newDoc);
-      return NextResponse.json({ success: true, data: newDoc });
+      console.warn('Prisma DB write notice, storing in runtime cache:', dbError);
+      addSharedDocument(newDoc);
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: newDoc.id,
+          name: newDoc.name,
+          fileName: newDoc.fileName,
+          type: newDoc.mimeType || `application/${newDoc.fileType}`,
+          fileType: newDoc.fileType,
+          size: newDoc.fileSize,
+          fileSize: newDoc.fileSize,
+          status: newDoc.status,
+          wordCount: newDoc.wordCount,
+          pages: newDoc.pages,
+          createdAt: newDoc.createdAt,
+        },
+      });
     }
   } catch (error) {
     console.error('Document upload error:', error);
@@ -256,7 +196,7 @@ export async function DELETE(req: NextRequest) {
     try {
       await prisma.document.delete({ where: { id } });
     } catch {
-      fallbackDocuments = fallbackDocuments.filter((d) => d.id !== id);
+      removeSharedDocument(id);
     }
 
     return NextResponse.json({ success: true, message: 'Document removed from active corpus.' });

@@ -60,15 +60,7 @@ export default function ResearchSessionPage({ params }: ResearchSessionPageProps
     loadData();
   }, [conversationId]);
 
-  // Execute initial query if query param `?q=` is present
-  useEffect(() => {
-    if (initialQuery && !initialSentRef.current && documents.length > 0) {
-      initialSentRef.current = true;
-      handleSendMessage(initialQuery);
-    }
-  }, [initialQuery, documents]);
-
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = React.useCallback(async (text: string) => {
     if (!text.trim() || chatStatus === 'loading' || chatStatus === 'streaming') return;
 
     setErrorMessage(null);
@@ -155,7 +147,15 @@ export default function ResearchSessionPage({ params }: ResearchSessionPageProps
       );
       setStreamingContent('');
     }
-  };
+  }, [chatStatus, conversationId, selectedDocumentIds]);
+
+  // Execute initial query if query param `?q=` is present
+  useEffect(() => {
+    if (initialQuery && !initialSentRef.current && documents.length > 0) {
+      initialSentRef.current = true;
+      handleSendMessage(initialQuery);
+    }
+  }, [initialQuery, documents, handleSendMessage]);
 
   const handleRegenerateLast = () => {
     // Find last user message

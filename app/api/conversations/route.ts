@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
-let fallbackConversations: Array<{
+const fallbackConversations: Array<{
   id: string;
   title: string;
   createdAt: Date;

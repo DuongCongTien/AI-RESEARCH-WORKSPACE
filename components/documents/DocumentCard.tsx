@@ -138,13 +138,16 @@ export function DocumentCard({
             >
               Inspect Chunks
             </button>
-            <button
-              type="button"
-              className="p-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/40 transition-colors active:scale-95"
-              title="View in Embedding Projector"
-            >
-              <span className="material-symbols-outlined text-[16px]">scatter_plot</span>
-            </button>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(doc.id)}
+                className="p-1.5 rounded-xl bg-surface-container-low hover:bg-rose-500/10 text-on-surface-variant hover:text-rose-600 border border-outline-variant/40 transition-colors active:scale-95 cursor-pointer"
+                title="Remove Document"
+              >
+                <span className="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
