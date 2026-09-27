@@ -64,9 +64,9 @@ export default function DashboardPage() {
     }
   };
 
-  // Metrics computation
-  const totalTokens = documents.reduce((sum, d) => sum + (d.tokensCount || 10500), 0) || 42190;
-  const readyDocs = documents.filter((d) => d.status === 'ready').length || 1;
+  // Metrics từ dữ liệu thực tế
+  const totalTokens = documents.reduce((sum, d) => sum + (d.tokensCount || 0), 0);
+  const readyDocs = documents.filter((d) => d.status === 'ready').length;
   const totalMB = (documents.reduce((sum, d) => sum + (d.fileSize || 0), 0) / (1024 * 1024)).toFixed(1);
 
   return (
@@ -143,10 +143,10 @@ export default function DashboardPage() {
             </div>
             <div className="mt-4">
               <span className="font-headline-lg text-headline-lg font-bold text-on-surface font-mono">
-                {documents.length || 4}
+                {documents.length}
               </span>
               <span className="font-label-xs text-label-xs text-primary block mt-0.5 font-semibold">
-                {readyDocs} Sẵn sàng • Đã đồng bộ
+                {readyDocs} Sẵn sàng
               </span>
             </div>
           </div>
@@ -269,40 +269,49 @@ export default function DashboardPage() {
                 Tài liệu nổi bật
               </h3>
               <Link href="/documents" className="font-label-xs text-label-xs text-primary font-semibold hover:underline">
-                Xem tất cả ({documents.length || 4})
+                Xem tất cả ({documents.length})
               </Link>
             </div>
 
             <div className="space-y-2">
-              {(documents.length > 0 ? documents : [
-                { id: '1', name: 'Bao_Cao_Thuong_Nien.pdf', status: 'ready', fileSize: 2.4 * 1024 * 1024, pages: 15 },
-                { id: '2', name: 'Phan_Tich_Thi_Truong.docx', status: 'processing', fileSize: 1.8 * 1024 * 1024, pages: 28 },
-                { id: '3', name: 'Ghi_Chu_Ky_Thuat.txt', status: 'uploading', fileSize: 420 * 1024, pages: 4 },
-              ]).slice(0, 3).map((doc) => {
-                const statusLabel = doc.status === 'ready' ? 'Sẵn sàng' : doc.status === 'processing' ? 'Đang xử lý' : doc.status === 'uploading' ? 'Đang tải lên' : 'Thất bại';
-                return (
+              {documents.length === 0 ? (
+                <div className="py-8 flex flex-col items-center justify-center text-center gap-2">
+                  <span className="material-symbols-outlined text-[32px] text-outline">folder_open</span>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Chưa có tài liệu nào.</p>
                   <Link
-                    key={doc.id}
-                    href={`/documents?selected=${doc.id}`}
-                    className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
+                    href="/documents"
+                    className="font-label-xs text-label-xs text-primary font-semibold hover:underline"
                   >
-                    <div className="flex items-center gap-2.5 truncate pr-2">
-                      <span className="material-symbols-outlined text-[18px] text-tertiary">article</span>
-                      <div className="min-w-0">
-                        <span className="font-body-sm text-body-sm text-on-surface font-semibold block truncate">
-                          {doc.name}
-                        </span>
-                        <span className="font-label-xs text-label-xs text-outline block">
-                          {doc.pages || 10} trang • {statusLabel}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold uppercase">
-                      {statusLabel}
-                    </span>
+                    Tải tài liệu lên
                   </Link>
-                );
-              })}
+                </div>
+              ) : (
+                documents.slice(0, 3).map((doc) => {
+                  const statusLabel = doc.status === 'ready' ? 'Sẵn sàng' : doc.status === 'processing' ? 'Đang xử lý' : doc.status === 'uploading' ? 'Đang tải lên' : 'Thất bại';
+                  return (
+                    <Link
+                      key={doc.id}
+                      href={`/documents?selected=${doc.id}`}
+                      className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
+                    >
+                      <div className="flex items-center gap-2.5 truncate pr-2">
+                        <span className="material-symbols-outlined text-[18px] text-tertiary">article</span>
+                        <div className="min-w-0">
+                          <span className="font-body-sm text-body-sm text-on-surface font-semibold block truncate">
+                            {doc.name}
+                          </span>
+                          <span className="font-label-xs text-label-xs text-outline block">
+                            {doc.pages || 0} trang • {statusLabel}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold uppercase">
+                        {statusLabel}
+                      </span>
+                    </Link>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -318,27 +327,30 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-2">
-              {(conversations.length > 0 ? conversations : [
-                { id: 'conv-1', title: 'Giảm thiểu sai số lượng tử', updatedAt: '12 phút trước' },
-                { id: 'conv-2', title: 'Kiểm tra đồng thuận đa tác nhân', updatedAt: '2 giờ trước' },
-                { id: 'conv-3', title: 'Tối ưu hóa không gian tiềm ẩn', updatedAt: '1 ngày trước' },
-              ]).slice(0, 3).map((conv) => (
-                <Link
-                  key={conv.id}
-                  href={`/research/${conv.id}`}
-                  className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
-                >
-                  <div className="flex items-center gap-2.5 truncate pr-2">
-                    <span className="material-symbols-outlined text-[18px] text-primary">chat_bubble</span>
-                    <span className="font-body-sm text-body-sm text-on-surface font-semibold truncate">
-                      {conv.title}
+              {conversations.length === 0 ? (
+                <div className="py-8 flex flex-col items-center justify-center text-center gap-2">
+                  <span className="material-symbols-outlined text-[32px] text-outline">chat_bubble_outline</span>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Chưa có phiên nghiên cứu nào.</p>
+                </div>
+              ) : (
+                conversations.slice(0, 3).map((conv) => (
+                  <Link
+                    key={conv.id}
+                    href={`/research/${conv.id}`}
+                    className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 transition-all duration-150 hover:translate-x-0.5"
+                  >
+                    <div className="flex items-center gap-2.5 truncate pr-2">
+                      <span className="material-symbols-outlined text-[18px] text-primary">chat_bubble</span>
+                      <span className="font-body-sm text-body-sm text-on-surface font-semibold truncate">
+                        {conv.title}
+                      </span>
+                    </div>
+                    <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
+                      {typeof conv.updatedAt === 'string' ? conv.updatedAt : 'Gần đây'}
                     </span>
-                  </div>
-                  <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
-                    {typeof conv.updatedAt === 'string' ? conv.updatedAt : 'Gần đây'}
-                  </span>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </div>

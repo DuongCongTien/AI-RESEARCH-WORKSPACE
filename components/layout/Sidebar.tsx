@@ -31,17 +31,6 @@ export function Sidebar({
     { label: 'Lịch sử tổng hợp', href: '/history', icon: 'history' },
   ];
 
-  // Danh sách tài liệu hiển thị dự phòng
-  const displayDocs = documents.length > 0 ? documents : [
-    { id: 'doc-1', name: 'ArXiv_2408_LLM_Plan.pdf', status: 'ready', fileType: 'pdf' },
-    { id: 'doc-2', name: 'benchmark_eval_v2.json', status: 'processing', fileType: 'json' },
-    { id: 'doc-3', name: 'BioMed_KG_Entity_Map', status: 'ready', fileType: 'graph' },
-  ];
-
-  const displayConvs = conversations.length > 0 ? conversations : [
-    { id: 'conv-1', title: 'Phân tích kiến trúc Transformer', updatedAt: '30 phút trước' },
-  ];
-
   const handleNewChat = () => {
     if (onNewConversation) {
       onNewConversation();
@@ -176,44 +165,58 @@ export function Sidebar({
               </button>
             </div>
             <nav className="space-y-1">
-              {displayDocs.slice(0, 5).map((doc) => {
-                const isReady = doc.status === 'ready';
-                const isProcessing = doc.status === 'processing';
-                return (
-                  <Link
-                    key={doc.id}
-                    href={`/documents?selected=${doc.id}`}
-                    onClick={onCloseMobileDrawer}
-                    className="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150 group"
-                  >
-                    <div className="flex items-center gap-space-sm truncate pr-2">
+              {documents.length === 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onOpenUpload) onOpenUpload();
+                    else router.push('/documents?upload=open');
+                  }}
+                  className="w-full flex items-center gap-space-sm px-space-sm py-1.5 rounded-lg text-outline hover:text-primary hover:bg-surface-container-high transition-all duration-150 font-label-xs text-label-xs"
+                >
+                  <span className="material-symbols-outlined text-[16px]">upload_file</span>
+                  <span>Tải tài liệu lên...</span>
+                </button>
+              ) : (
+                documents.slice(0, 5).map((doc) => {
+                  const isReady = doc.status === 'ready';
+                  const isProcessing = doc.status === 'processing';
+                  return (
+                    <Link
+                      key={doc.id}
+                      href={`/documents?selected=${doc.id}`}
+                      onClick={onCloseMobileDrawer}
+                      className="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150 group"
+                    >
+                      <div className="flex items-center gap-space-sm truncate pr-2">
+                        <span
+                          className={`material-symbols-outlined text-[16px] ${
+                            doc.fileType === 'pdf'
+                              ? 'text-tertiary'
+                              : doc.fileType === 'docx'
+                              ? 'text-primary'
+                              : 'text-secondary'
+                          }`}
+                        >
+                          {doc.fileType === 'pdf' ? 'article' : doc.fileType === 'json' ? 'dataset' : 'account_tree'}
+                        </span>
+                        <span className="font-body-sm text-body-sm truncate">{doc.name}</span>
+                      </div>
                       <span
-                        className={`material-symbols-outlined text-[16px] ${
-                          doc.fileType === 'pdf'
-                            ? 'text-tertiary'
-                            : doc.fileType === 'docx'
-                            ? 'text-primary'
-                            : 'text-secondary'
+                        className={`font-label-xs text-label-xs px-1.5 py-0.5 rounded-md uppercase font-medium ${
+                          isReady
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-tertiary-container/30 dark:text-tertiary'
+                            : isProcessing
+                            ? 'bg-amber-50 text-amber-600 border border-amber-200 animate-pulse'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200'
                         }`}
                       >
-                        {doc.fileType === 'pdf' ? 'article' : doc.fileType === 'json' ? 'dataset' : 'account_tree'}
+                        {isReady ? 'ĐÃ NẠP' : isProcessing ? 'ĐANG XỬ LÝ' : 'LỖI'}
                       </span>
-                      <span className="font-body-sm text-body-sm truncate">{doc.name}</span>
-                    </div>
-                    <span
-                      className={`font-label-xs text-label-xs px-1.5 py-0.5 rounded-md uppercase font-medium ${
-                        isReady
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-tertiary-container/30 dark:text-tertiary'
-                          : isProcessing
-                          ? 'bg-amber-50 text-amber-600 border border-amber-200 animate-pulse'
-                          : 'bg-rose-50 text-rose-600 border border-rose-200'
-                      }`}
-                    >
-                      {isReady ? 'ĐÃ NẠP' : isProcessing ? 'ĐANG XỬ LÝ' : 'LỖI'}
-                    </span>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                })
+              )}
             </nav>
           </div>
 
@@ -223,35 +226,41 @@ export function Sidebar({
               Hội thoại gần đây
             </span>
             <nav className="space-y-1">
-              {displayConvs.slice(0, 8).map((conv) => {
-                const isActive = pathname === `/research/${conv.id}`;
-                return (
-                  <Link
-                    key={conv.id}
-                    href={`/research/${conv.id}`}
-                    onClick={onCloseMobileDrawer}
-                    className={`flex items-center justify-between px-space-sm py-1.5 rounded-lg text-body-sm transition-all duration-150 group ${
-                      isActive
-                        ? 'bg-primary/10 text-primary font-semibold border border-primary/20 shadow-xs'
-                        : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5'
-                    }`}
-                  >
-                    <div className="flex items-center gap-space-sm truncate pr-2">
-                      <span
-                        className={`material-symbols-outlined text-[16px] transition-colors ${
-                          isActive ? 'text-primary' : 'text-outline group-hover:text-primary'
-                        }`}
-                      >
-                        chat_bubble
+              {conversations.length === 0 ? (
+                <p className="px-space-sm py-1.5 font-label-xs text-label-xs text-outline italic">
+                  Chưa có phiên nào...
+                </p>
+              ) : (
+                conversations.slice(0, 8).map((conv) => {
+                  const isActive = pathname === `/research/${conv.id}`;
+                  return (
+                    <Link
+                      key={conv.id}
+                      href={`/research/${conv.id}`}
+                      onClick={onCloseMobileDrawer}
+                      className={`flex items-center justify-between px-space-sm py-1.5 rounded-lg text-body-sm transition-all duration-150 group ${
+                        isActive
+                          ? 'bg-primary/10 text-primary font-semibold border border-primary/20 shadow-xs'
+                          : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-space-sm truncate pr-2">
+                        <span
+                          className={`material-symbols-outlined text-[16px] transition-colors ${
+                            isActive ? 'text-primary' : 'text-outline group-hover:text-primary'
+                          }`}
+                        >
+                          chat_bubble
+                        </span>
+                        <span className="truncate">{conv.title}</span>
+                      </div>
+                      <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
+                        {formatRelativeTime(conv.updatedAt)}
                       </span>
-                      <span className="truncate">{conv.title}</span>
-                    </div>
-                    <span className="font-label-xs text-label-xs text-outline shrink-0 font-mono">
-                      {formatRelativeTime(conv.updatedAt)}
-                    </span>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                })
+              )}
             </nav>
           </div>
         </div>

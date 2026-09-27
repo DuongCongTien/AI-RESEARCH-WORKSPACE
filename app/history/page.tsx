@@ -6,49 +6,10 @@ import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout/AppShell';
 import { ConversationItem } from '@/types';
 
-// Default mock history if DB is empty
-const INITIAL_DEMO_HISTORY: ConversationItem[] = [
-  {
-    id: 'conv-1',
-    title: 'Giảm thiểu sai số lượng tử',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
-    messages: [
-      {
-        id: 'm1',
-        conversationId: 'conv-1',
-        role: 'user',
-        content: 'Đánh giá các thuật toán giảm thiểu sai số lượng tử trên các thiết bị trung gian.',
-        createdAt: new Date().toISOString(),
-      },
-    ],
-  },
-  {
-    id: 'conv-2',
-    title: 'Kiểm tra đồng thuận đa tác nhân',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    messages: [],
-  },
-  {
-    id: 'conv-3',
-    title: 'Tối ưu hóa không gian tiềm ẩn',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    messages: [],
-  },
-  {
-    id: 'conv-4',
-    title: 'Phân tích rủi ro báo cáo thường niên',
-    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-    messages: [],
-  },
-];
-
 export default function HistoryPage() {
   const router = useRouter();
-  const [conversations, setConversations] = useState<ConversationItem[]>(INITIAL_DEMO_HISTORY);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -57,12 +18,14 @@ export default function HistoryPage() {
         const res = await fetch('/api/conversations');
         if (res.ok) {
           const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          if (json.success && Array.isArray(json.data)) {
             setConversations(json.data);
           }
         }
       } catch (err) {
-        console.warn('History load fallback notice:', err);
+        console.warn('History load error:', err);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -153,15 +116,29 @@ export default function HistoryPage() {
         </div>
 
         {/* History Groups */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="h-64 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[32px] text-outline animate-spin">progress_activity</span>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center p-8 bg-surface rounded-2xl border border-outline-variant/40 shadow-xs">
             <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center mb-3 text-outline">
               <span className="material-symbols-outlined text-[32px]">chat_bubble_outline</span>
             </div>
-            <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Không tìm thấy cuộc trò chuyện nào</h3>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Chưa có phiên nghiên cứu nào</h3>
             <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm mt-1">
-              {searchQuery ? 'Không có cuộc trò chuyện nào khớp với tìm kiếm.' : 'Bạn chưa thực hiện phiên nghiên cứu nào.'}
+              {searchQuery ? 'Không có cuộc trò chuyện nào khớp với tìm kiếm.' : 'Bắt đầu một phiên nghiên cứu mới để thấy lịch sử tại đây.'}
             </p>
+            {!searchQuery && (
+              <button
+                type="button"
+                onClick={() => router.push('/research')}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary/90 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <span className="material-symbols-outlined text-[16px]">add</span>
+                Bắt đầu nghiên cứu
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-space-lg">
