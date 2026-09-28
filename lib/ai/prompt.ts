@@ -40,9 +40,6 @@ SCHEMA JSON YÊU CẦU:
   ]
 }`;
 
-export const DAY1_SYSTEM_PROMPT = DAY2_SYSTEM_PROMPT;
-export const RESEARCH_SYSTEM_PROMPT = DAY2_SYSTEM_PROMPT;
-
 export function buildDocumentContextPrompt(
   question: string,
   documents: Array<{ id: string; name: string; content?: string | null }>
@@ -66,8 +63,3 @@ ${question}
 
 Hướng dẫn: Phân tích ngữ cảnh tài liệu ở trên và trả lời hoàn toàn bằng tiếng Việt dưới dạng một đối tượng JSON hợp lệ duy nhất tuân thủ đúng schema ResearchResponse.`;
 }
-
-export const generateResearchAnalysisPrompt = (
-  query: string,
-  documentContexts?: { id: string; name: string; content: string }[]
-) => buildDocumentContextPrompt(query, documentContexts || []);

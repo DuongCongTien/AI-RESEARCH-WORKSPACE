@@ -8,7 +8,7 @@ export interface ParsedDocument {
 }
 
 // Fallback direct text stream extractor for PDFs with corrupted xrefs or worker issues
-function extractRawPdfTextFallback(buffer: Buffer): string {
+export function extractRawPdfTextFallback(buffer: Buffer): string {
   const content = buffer.toString('latin1');
   const textMatches: string[] = [];
 

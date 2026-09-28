@@ -1,14 +1,6 @@
 export * from './research';
+import type { DocumentStatus } from './research';
 
-export type DocumentStatus =
-  | 'uploading'
-  | 'processing'
-  | 'ready'
-  | 'failed'
-  | 'UPLOADING'
-  | 'PROCESSING'
-  | 'READY'
-  | 'FAILED';
 
 export interface DocumentChunk {
   id: string;

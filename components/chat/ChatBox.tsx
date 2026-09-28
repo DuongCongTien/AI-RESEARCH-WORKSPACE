@@ -257,6 +257,3 @@ export function ChatBox({
     </div>
   );
 }
-
-// Export ChatWindow để tương thích ngược
-export { ChatBox as ChatWindow };

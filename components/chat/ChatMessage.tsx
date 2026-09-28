@@ -207,6 +207,3 @@ export function ChatMessage({
     </div>
   );
 }
-
-// Export MessageItem để tương thích ngược
-export { ChatMessage as MessageItem };
