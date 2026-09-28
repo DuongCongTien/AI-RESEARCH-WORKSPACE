@@ -265,22 +265,13 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* Chân thanh bên: Cài đặt và Phiên bản */}
-        <div className="p-space-md border-t border-outline-variant/50 flex items-center justify-between shrink-0">
-          <Link
-            href="/settings"
-            onClick={onCloseMobileDrawer}
-            className={`flex items-center gap-space-sm transition-colors ${
-              pathname === '/settings' ? 'text-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">settings</span>
-            <span className="font-body-sm text-body-sm">Cài đặt</span>
-          </Link>
+        {/* Chân thanh bên: Phiên bản */}
+        <div className="p-space-md border-t border-outline-variant/50 flex items-center justify-end shrink-0">
           <span className="font-label-xs text-label-xs text-outline bg-surface-container-high px-2 py-0.5 rounded-full border border-outline-variant/60 font-mono font-medium">
             v2.4-prod
           </span>
         </div>
+
       </div>
     </aside>
   );

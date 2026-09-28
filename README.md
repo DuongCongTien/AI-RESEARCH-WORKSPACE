@@ -49,12 +49,6 @@ A senior-grade, full-stack AI Research Workspace for multi-document synthesis, c
 - **Instant Search**: Filter past research sessions by title or inquiry.
 - **One-Click Resumption**: Re-opens exact research context, message threads, and grounding files.
 
-### Configuration & Settings (`/settings`)
-- **Synthesis Engine Selection**: Switch between Claude 3.5 Sonnet / GPT-4o Research Edition, GPT-4o Deep Research, Claude 3.7 Sonnet Thinking, and Gemini 1.5 Pro.
-- **Embedding Controls**: Configure dense projection models (`text-embedding-3-large`, `cohere-embed-v3`).
-- **Chunk Size & Overlap Sliders**: Tune chunk token limits (200 - 2000 tokens) and overlap ratios.
-- **Synthesis Temperature**: Fine-tune deterministic grounding vs. exploratory creativity.
-
 ---
 
 ## 3. Tech Stack
@@ -82,7 +76,6 @@ app/
 │   ├── page.tsx              # Session initializer
 │   └── [id]/page.tsx         # Interactive research session with streaming chat
 ├── history/page.tsx          # Chronological synthesis history archives
-├── settings/page.tsx         # Engine parameters and storage settings
 └── api/
     ├── documents/            # List, upload (multipart), delete
     │   └── [id]/route.ts     # Document details & PATCH context toggle

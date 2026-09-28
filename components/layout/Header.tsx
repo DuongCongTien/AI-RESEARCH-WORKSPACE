@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 
 interface HeaderProps {
   onToggleMobileMenu?: () => void;
@@ -138,19 +137,18 @@ export function Header({ onToggleMobileMenu }: HeaderProps) {
           <div className="h-4 w-[1px] bg-outline-variant/40"></div>
 
           {/* User Profile */}
-          <Link
-            href="/settings"
-            className="flex items-center gap-space-sm pl-space-xs hover:opacity-90 transition-all group"
+          <div
+            className="flex items-center gap-space-sm pl-space-xs"
             title="Hồ sơ tài khoản"
           >
-            <div className="w-8 h-8 rounded-full border border-outline-variant/60 overflow-hidden bg-primary-container text-primary font-bold text-xs flex items-center justify-center shadow-xs group-hover:ring-2 group-hover:ring-primary/30 transition-all">
+            <div className="w-8 h-8 rounded-full border border-outline-variant/60 overflow-hidden bg-primary-container text-primary font-bold text-xs flex items-center justify-center shadow-xs">
               AI
             </div>
             <div className="hidden xl:flex flex-col text-left">
               <span className="font-body-sm text-body-sm leading-none font-semibold text-on-surface">Người dùng</span>
               <span className="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Không gian nghiên cứu</span>
             </div>
-          </Link>
+          </div>
         </div>
       </header>
 
