@@ -6,6 +6,12 @@ const config = {
   testMatch: ['**/__tests__/**/*.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    // Mock ESM-only AI SDK modules that cannot be required in Jest CommonJS
+    '^@ai-sdk/(.*)$': '<rootDir>/lib/__mocks__/@ai-sdk/$1',
+    '^ai$': '<rootDir>/lib/__mocks__/ai',
+    // Mock Prisma client
+    '^@/lib/prisma$': '<rootDir>/lib/__mocks__/prisma',
+    '^@prisma/client$': '<rootDir>/lib/__mocks__/@prisma/client',
   },
   transform: {
     '^.+\\.tsx?$': [
