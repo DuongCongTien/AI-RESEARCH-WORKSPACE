@@ -13,6 +13,7 @@ interface DocumentCardProps {
   onCancel?: (id: string) => void;
   onInspectChunks?: (doc: DocumentItem) => void;
   onDelete?: (id: string) => void;
+  onReplace?: (id: string) => void;
 }
 
 export function DocumentCard({
@@ -25,6 +26,7 @@ export function DocumentCard({
   onCancel,
   onInspectChunks,
   onDelete,
+  onReplace,
 }: DocumentCardProps) {
   const fileSizeMB = doc.fileSize
     ? doc.fileSize > 1024 * 1024
@@ -446,18 +448,31 @@ export function DocumentCard({
 
       {/* Card Actions */}
       <div className="flex items-center justify-between gap-space-xs pt-space-lg mt-space-sm border-t border-outline-variant/40">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onRetry && onRetry(doc.id)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px] text-tertiary">replay</span>
+            Thử xử lý lại
+          </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(doc.id)}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-body-sm text-body-sm transition-all cursor-pointer"
+              title="Xóa tệp lỗi khỏi không gian nghiên cứu"
+            >
+              <span className="material-symbols-outlined text-[16px]">delete</span>
+              Xóa
+            </button>
+          )}
+        </div>
         <button
           type="button"
-          onClick={() => onRetry && onRetry(doc.id)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-2xs active:scale-95"
-        >
-          <span className="material-symbols-outlined text-[16px] text-tertiary">replay</span>
-          Thử xử lý lại
-        </button>
-        <button
-          type="button"
-          onClick={() => onRetry && onRetry(doc.id)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-xs active:scale-95"
+          onClick={() => (onReplace ? onReplace(doc.id) : onRetry && onRetry(doc.id))}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-xs active:scale-95 cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px]">file_upload</span>
           Thay thế tệp

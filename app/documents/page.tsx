@@ -137,15 +137,92 @@ export default function DocumentsPage() {
     }, 1500);
   };
 
-  const handleRetryProcessing = (id: string) => {
+  const replaceFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [replacingDocId, setReplacingDocId] = useState<string | null>(null);
+
+  const handleStartReplace = (id: string) => {
+    setReplacingDocId(id);
+    replaceFileInputRef.current?.click();
+  };
+
+  const handleFileReplaced = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !replacingDocId) return;
+
+    const oldId = replacingDocId;
+    setReplacingDocId(null);
+
+    setDocuments((prev) =>
+      prev.map((d) =>
+        d.id === oldId
+          ? { ...d, status: 'processing', progress: 30, step: `Đang tải tệp thay thế ${file.name}...` }
+          : d
+      )
+    );
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success && json.data) {
+        // Remove old document from server
+        await fetch(`/api/documents?id=${oldId}`, { method: 'DELETE' });
+
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === oldId ? json.data : d))
+        );
+        setSelectedIds((prev) =>
+          prev.includes(oldId) ? [...prev.filter((id) => id !== oldId), json.data.id] : prev
+        );
+        if (previewDoc?.id === oldId) {
+          setPreviewDoc(json.data);
+        }
+      } else {
+        throw new Error(json.error || 'Thay thế tệp thất bại');
+      }
+    } catch (err) {
+      console.error('Lỗi thay thế tệp:', err);
+      alert(err instanceof Error ? err.message : 'Thay thế tệp thất bại');
+    } finally {
+      if (replaceFileInputRef.current) {
+        replaceFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDeleteDoc = async (id: string) => {
+    const docToDelete = documents.find((d) => d.id === id);
+    const confirmDelete = window.confirm(`Xóa tài liệu "${docToDelete?.name || id}" khỏi không gian nghiên cứu?`);
+    if (!confirmDelete) return;
+
+    try {
+      await fetch(`/api/documents?id=${id}`, { method: 'DELETE' });
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+      setSelectedIds((prev) => prev.filter((dId) => dId !== id));
+      if (previewDoc?.id === id) {
+        setIsPreviewOpen(false);
+        setPreviewDoc(null);
+      }
+    } catch (e) {
+      console.error('Delete document error:', e);
+    }
+  };
+
+  const handleRetryProcessing = async (id: string) => {
     setDocuments((prev) =>
       prev.map((d) => {
         if (d.id === id) {
           return {
             ...d,
             status: 'processing',
-            progress: 15,
-            step: 'Đang khởi tạo lại OCR và mã hóa văn bản...',
+            progress: 35,
+            step: 'Đang khởi tạo lại OCR và phân tích văn bản...',
             errorMsg: null,
             errorCode: null,
           };
@@ -153,6 +230,23 @@ export default function DocumentsPage() {
         return d;
       })
     );
+
+    try {
+      await fetch(`/api/documents/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'ready',
+          inContext: true,
+          progress: 100,
+          step: 'Đã hoàn thành',
+          errorMsg: null,
+          errorCode: null,
+        }),
+      });
+    } catch (err) {
+      console.warn('Lỗi khi đồng bộ trạng thái tài liệu:', err);
+    }
 
     setTimeout(() => {
       setDocuments((prev) =>
@@ -163,12 +257,15 @@ export default function DocumentsPage() {
               status: 'ready',
               progress: 100,
               step: 'Đã hoàn thành',
+              errorMsg: null,
+              errorCode: null,
+              inContext: true,
             };
           }
           return d;
         })
       );
-    }, 3000);
+    }, 1000);
   };
 
   const handleCancelTask = (id: string) => {
@@ -325,12 +422,23 @@ export default function DocumentsPage() {
                     onRetry={handleRetryProcessing}
                     onCancel={handleCancelTask}
                     onInspectChunks={handleOpenPreview}
+                    onDelete={handleDeleteDoc}
+                    onReplace={handleStartReplace}
                   />
                 ))}
               </div>
             )}
           </div>
         </div>
+
+        {/* Hidden replacement file input */}
+        <input
+          type="file"
+          ref={replaceFileInputRef}
+          onChange={handleFileReplaced}
+          accept=".pdf,.docx,.txt,.json,.md"
+          className="hidden"
+        />
 
         {/* QUICK PREVIEW DRAWER (Docked on Right) */}
         <DocumentPreviewDrawer
@@ -345,10 +453,13 @@ export default function DocumentsPage() {
         <UploadDialog
           isOpen={isUploadOpen}
           onClose={() => setIsUploadOpen(false)}
-          onUploaded={(newDoc) => {
-            setDocuments((prev) => [newDoc, ...prev]);
-            setSelectedIds((prev) => [...prev, newDoc.id]);
-            setPreviewDoc(newDoc);
+          onUploaded={(uploaded) => {
+            const newDocs = Array.isArray(uploaded) ? uploaded : [uploaded];
+            setDocuments((prev) => [...newDocs, ...prev]);
+            setSelectedIds((prev) => [...prev, ...newDocs.map((d) => d.id)]);
+            if (newDocs.length > 0) {
+              setPreviewDoc(newDocs[0]);
+            }
             setIsUploadOpen(false);
           }}
         />

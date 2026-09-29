@@ -135,3 +135,54 @@ describe('buildDeterministicResponse', () => {
     expect(result.sources[0].excerpt).toContain('neural networks');
   });
 });
+
+// ─── safeParseResearchResponse ───────────────────────────────────────────────
+
+import { safeParseResearchResponse } from '@/types/research';
+
+describe('safeParseResearchResponse', () => {
+  it('parses valid JSON response', () => {
+    const jsonStr = JSON.stringify({
+      summary: 'Lời giải bài 6',
+      key_points: ['Điểm 1'],
+      risks: [{ title: 'Tràn số', description: 'Tránh tràn số', severity: 'medium' }],
+      actions: [{ title: 'Bước 1', description: 'Code mẫu' }],
+      sources: [{ documentId: 'doc-1', documentName: 'Doc', page: 1 }],
+    });
+    const parsed = safeParseResearchResponse(jsonStr);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.summary).toBe('Lời giải bài 6');
+    expect(parsed?.key_points).toHaveLength(1);
+    expect(parsed?.risks[0].severity).toBe('medium');
+  });
+
+  it('handles markdown fence wrapped JSON with code blocks inside', () => {
+    const raw = "```json\n" +
+      JSON.stringify({
+        summary: "Hướng dẫn giải bài 6:\n```java\nString[] words = s.split(\"\\\\s+\");\n```",
+        key_points: ["Tách chuỗi"],
+        actions: [],
+        risks: [],
+        sources: []
+      }) +
+      "\n```";
+    const parsed = safeParseResearchResponse(raw);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.summary).toContain('String[] words');
+  });
+
+  it('heals unescaped newlines in JSON string literals', () => {
+    // Malformed JSON with actual raw newlines inside string literal
+    const malformed = `{\n  "summary": "Dòng 1\nDòng 2\nDòng 3",\n  "key_points": ["K1"]\n}`;
+    const parsed = safeParseResearchResponse(malformed);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.summary).toContain('Dòng 1');
+  });
+
+  it('cleans up raw JSON artifact remnants in summary', () => {
+    const rawWithPrefix = `{"summary": "Lời giải chi tiết bài toán", "key_points": []}`;
+    const parsed = safeParseResearchResponse(rawWithPrefix);
+    expect(parsed?.summary).not.toContain('{"summary":');
+  });
+});
+

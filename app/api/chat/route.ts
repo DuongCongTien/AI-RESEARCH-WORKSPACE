@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDatabaseAvailable } from '@/lib/prisma';
 import { getSharedDocuments } from '@/lib/documents/cache';
 import {
   addSharedMessage,
   updateSharedConversation,
   addSharedConversation,
+  getSharedConversations,
 } from '@/lib/conversations/cache';
+import { ConversationItem, MessageItemType } from '@/types';
 import {
   cleanTitle,
   validateAndMapSources,
   buildDeterministicResponse,
   AttachedDoc,
 } from '@/lib/ai/research';
-import { openai, DEFAULT_MODEL, hasOpenAiKey } from '@/lib/ai/client';
+import { getAiModel, hasAiKey } from '@/lib/ai/client';
 import { DAY2_SYSTEM_PROMPT, buildDocumentContextPrompt } from '@/lib/ai/prompt';
 import { streamText } from 'ai';
 import { ResearchResponse, safeParseResearchResponse } from '@/types/research';
@@ -20,19 +22,21 @@ import { ResearchResponse, safeParseResearchResponse } from '@/types/research';
 // ─── Document lookup ──────────────────────────────────────────────────────────
 
 async function fetchAttachedDocs(documentIds: string[]): Promise<AttachedDoc[]> {
-  try {
-    const found = await prisma.document.findMany({
-      where: { id: { in: documentIds } },
-    });
-    if (found.length > 0) {
-      return found.map((d) => ({
-        id: d.id,
-        name: d.name,
-        content: (d.content || d.textContent || '').trim(),
-      }));
+  if (await isDatabaseAvailable()) {
+    try {
+      const found = await prisma.document.findMany({
+        where: { id: { in: documentIds } },
+      });
+      if (found.length > 0) {
+        return found.map((d) => ({
+          id: d.id,
+          name: d.name,
+          content: (d.content || d.textContent || '').trim(),
+        }));
+      }
+    } catch (dbErr) {
+      console.warn('Prisma document lookup fallback notice:', dbErr);
     }
-  } catch (dbErr) {
-    console.warn('Prisma document lookup fallback notice:', dbErr);
   }
 
   // In-memory fallback when DB is offline
@@ -56,20 +60,25 @@ async function ensureConversation(
   if (conversationId) return conversationId;
 
   const newId = `conv-${Date.now()}`;
-  try {
-    await prisma.conversation.create({
-      data: { id: newId, title: cleanTitle(message) },
-    });
-  } catch {
-    addSharedConversation({
-      id: newId,
-      title: cleanTitle(message),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      messages: [],
-      documentIds,
-    });
+  if (await isDatabaseAvailable()) {
+    try {
+      await prisma.conversation.create({
+        data: { id: newId, title: cleanTitle(message) },
+      });
+      return newId;
+    } catch {
+      // Fallback to shared in-memory storage below
+    }
   }
+
+  addSharedConversation({
+    id: newId,
+    title: cleanTitle(message),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    messages: [],
+    documentIds,
+  });
   return newId;
 }
 
@@ -81,60 +90,64 @@ async function persistMessages(
   structuredResult: ResearchResponse,
   fullText: string
 ): Promise<void> {
-  try {
-    const conv = await prisma.conversation.findUnique({
-      where: { id: conversationId },
-      include: { messages: true },
-    });
-    if (
-      conv &&
-      (conv.title === 'New Research Chat' ||
-        conv.title === 'Nghiên cứu mới' ||
-        conv.title === 'Cuộc trò chuyện mới' ||
-        conv.messages.length === 0)
-    ) {
-      await prisma.conversation.update({
+  if (await isDatabaseAvailable()) {
+    try {
+      const conv = await prisma.conversation.findUnique({
         where: { id: conversationId },
-        data: { title: cleanTitle(message), updatedAt: new Date() },
+        include: { messages: true },
       });
+      if (
+        conv &&
+        (conv.title === 'New Research Chat' ||
+          conv.title === 'Nghiên cứu mới' ||
+          conv.title === 'Cuộc trò chuyện mới' ||
+          conv.messages.length === 0)
+      ) {
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { title: cleanTitle(message), updatedAt: new Date() },
+        });
+      }
+      await prisma.message.create({
+        data: { conversationId, role: 'user', content: message },
+      });
+      await prisma.message.create({
+        data: {
+          conversationId,
+          role: 'assistant',
+          content: structuredResult.summary || fullText,
+          structuredData: structuredResult as unknown as object,
+        },
+      });
+      return;
+    } catch (dbErr) {
+      console.warn('Prisma persistence warning, falling back to memory cache:', dbErr);
     }
-    await prisma.message.create({
-      data: { conversationId, role: 'user', content: message },
-    });
-    await prisma.message.create({
-      data: {
-        conversationId,
-        role: 'assistant',
-        content: structuredResult.summary || fullText,
-        structuredData: structuredResult as unknown as object,
-      },
-    });
-  } catch (dbErr) {
-    console.warn('Prisma persistence warning, falling back to memory cache:', dbErr);
-    addSharedMessage(conversationId, {
-      id: `user-${Date.now()}`,
-      conversationId,
-      role: 'user',
-      content: message,
-      createdAt: new Date().toISOString(),
-    });
-    addSharedMessage(conversationId, {
-      id: `asst-${Date.now()}`,
-      conversationId,
-      role: 'assistant',
-      content: structuredResult.summary || fullText,
-      structuredResponse: structuredResult,
-      createdAt: new Date().toISOString(),
-    });
-    updateSharedConversation(conversationId, (c) => ({
-      ...c,
-      title:
-        c.title === 'New Research Chat' || c.title === 'Nghiên cứu mới'
-          ? cleanTitle(message)
-          : c.title,
-      updatedAt: new Date().toISOString(),
-    }));
   }
+
+  addSharedMessage(conversationId, {
+    id: `user-${Date.now()}`,
+    conversationId,
+    role: 'user',
+    content: message,
+    createdAt: new Date().toISOString(),
+  });
+  addSharedMessage(conversationId, {
+    id: `asst-${Date.now()}`,
+    conversationId,
+    role: 'assistant',
+    content: structuredResult.summary || fullText,
+    structuredResponse: structuredResult,
+    createdAt: new Date().toISOString(),
+  });
+  updateSharedConversation(conversationId, (c) => ({
+    ...c,
+    title:
+      c.title === 'New Research Chat' || c.title === 'Nghiên cứu mới'
+        ? cleanTitle(message)
+        : c.title,
+    updatedAt: new Date().toISOString(),
+  }));
 }
 
 // ─── Route handler ────────────────────────────────────────────────────────────
@@ -175,7 +188,37 @@ export async function POST(req: NextRequest) {
     }
 
     const activeConvId = await ensureConversation(conversationId, message.trim(), documentIds);
-    const prompt = buildDocumentContextPrompt(message.trim(), attachedDocs);
+
+    // Fetch previous conversation history for multi-turn awareness
+    let historyMessages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+    if (await isDatabaseAvailable()) {
+      try {
+        const prevMsgs = await prisma.message.findMany({
+          where: { conversationId: activeConvId },
+          orderBy: { createdAt: 'asc' },
+          take: 12,
+        });
+        if (prevMsgs.length > 0) {
+          historyMessages = prevMsgs.map((m) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          }));
+        }
+      } catch (dbErr) {
+        console.warn('Prisma history lookup notice:', dbErr);
+      }
+    }
+    if (historyMessages.length === 0) {
+      const sharedConv = getSharedConversations().find((c: ConversationItem) => c.id === activeConvId);
+      if (sharedConv && sharedConv.messages) {
+        historyMessages = sharedConv.messages.slice(-12).map((m: MessageItemType) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
+      }
+    }
+
+    const prompt = buildDocumentContextPrompt(message.trim(), attachedDocs, historyMessages);
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
@@ -187,9 +230,9 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(JSON.stringify(obj) + '\n'));
 
         try {
-          if (hasOpenAiKey()) {
+          if (hasAiKey()) {
             const result = streamText({
-              model: openai(DEFAULT_MODEL),
+              model: getAiModel(),
               system: DAY2_SYSTEM_PROMPT,
               prompt,
               temperature: 0.1,
@@ -211,8 +254,23 @@ export async function POST(req: NextRequest) {
           }
 
           if (!structuredResult) {
-            structuredResult = buildDeterministicResponse(message.trim(), attachedDocs);
-            if (fullText.trim()) structuredResult.summary = fullText.slice(0, 300);
+            if (fullText.trim()) {
+              structuredResult = {
+                summary: fullText.trim(),
+                key_points: [`Tổng hợp trực tiếp từ: ${attachedDocs.map((d) => d.name).join(', ')}`],
+                keyPoints: [`Tổng hợp trực tiếp từ: ${attachedDocs.map((d) => d.name).join(', ')}`],
+                risks: [],
+                actions: [],
+                sources: attachedDocs.map((doc, idx) => ({
+                  documentId: doc.id,
+                  documentName: doc.name,
+                  page: idx + 1,
+                  excerpt: doc.content ? doc.content.slice(0, 180) + '...' : undefined,
+                })),
+              };
+            } else {
+              structuredResult = buildDeterministicResponse(message.trim(), attachedDocs);
+            }
           }
 
           structuredResult.sources = validateAndMapSources(structuredResult.sources, attachedDocs);

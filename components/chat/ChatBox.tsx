@@ -20,6 +20,23 @@ interface ChatBoxProps {
   errorMessage?: string | null;
 }
 
+function formatStreamingDisplay(raw: string): string {
+  if (!raw) return 'Đang khởi tạo phân tích...';
+  const trimmed = raw.trim();
+  const summaryMatch = trimmed.match(/"summary"\s*:\s*"([\s\S]*)/);
+  if (summaryMatch) {
+    let clean = summaryMatch[1];
+    clean = clean.replace(/"\s*,\s*"(?:key_points|keyPoints|risks|actions|sources)[\s\S]*$/, '');
+    clean = clean.replace(/"\s*\}?$/, '');
+    clean = clean.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+    return clean.trim() || 'Đang xây dựng lời giải và phân tích chi tiết...';
+  }
+  if (trimmed.startsWith('{') || trimmed.startsWith('```json')) {
+    return 'Đang đọc hiểu tài liệu và xây dựng cấu trúc lời giải...';
+  }
+  return raw;
+}
+
 export function ChatBox({
   messages,
   status,
@@ -114,44 +131,46 @@ export function ChatBox({
               );
             })}
 
-            {/* Trạng thái AI đang stream theo thời gian thực */}
+            {/* Real-time AI streaming state */}
             {status === 'streaming' && (
-              <div className="flex w-full gap-3 sm:gap-4 py-3 justify-start animate-fade-in-up">
-                <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mt-1 shadow-2xs">
+              <div className="flex w-full gap-3 sm:gap-4 py-2 justify-start animate-fade-in-up">
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/15 border border-primary/25 mt-1 shadow-sm">
                   <Sparkles className="w-4 h-4 animate-pulse text-primary" />
                 </div>
                 <div className="flex flex-col items-start w-full max-w-full">
-                  <div className="flex items-center gap-2 mb-2 px-1 text-xs text-muted-foreground font-mono">
-                    <span className="font-semibold text-primary">Đang tổng hợp theo thời gian thực</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1 h-3.5">
-                      <span className="w-1 h-2 bg-primary rounded-full animate-bounce"></span>
-                      <span className="w-1 h-3 bg-primary rounded-full animate-bounce delay-75"></span>
-                      <span className="w-1 h-2 bg-primary rounded-full animate-bounce delay-150"></span>
+                  {/* Status bar */}
+                  <div className="flex items-center gap-2 mb-2 px-0.5">
+                    <div className="flex items-center gap-1.5 h-4">
+                      <span className="w-1 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1 h-4 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '120ms' }} />
+                      <span className="w-1 h-2 bg-tertiary rounded-full animate-bounce" style={{ animationDelay: '240ms' }} />
                     </div>
-                    <span>•</span>
-                    <span className="text-muted-foreground">Kênh truyền mã thời gian thực</span>
+                    <span className="text-xs font-semibold text-primary">AI đang phân tích</span>
+                    <span className="text-xs text-muted-foreground font-mono">• trực tiếp</span>
                   </div>
-                  <div className="w-full rounded-2xl rounded-tl-xs border border-border bg-surface p-4 sm:p-5 shadow-xs space-y-2">
-                    <p className="text-sm leading-relaxed text-foreground whitespace-pre-line font-mono">
-                      {streamingContent || 'Đang tổng hợp phân tích bám sát dữ liệu từ kho tài liệu...'}
-                      <span className="inline-block w-2 h-4 ml-1.5 bg-primary rounded-xs animate-pulse align-middle"></span>
+                  {/* Content panel */}
+                  <div className="relative w-full rounded-2xl rounded-tl-sm border border-primary/20 bg-gradient-to-br from-surface via-surface to-primary/3 p-4 sm:p-5 shadow-sm overflow-hidden">
+                    {/* Animated scan line */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent animate-scan-line" />
+                    <p className="text-sm leading-relaxed text-foreground whitespace-pre-line">
+                      {formatStreamingDisplay(streamingContent)}
+                      <span className="inline-block w-0.5 h-4 ml-1 bg-primary rounded-full animate-pulse align-middle" />
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Trạng thái đang tải */}
+            {/* Loading state */}
             {status === 'loading' && (
-              <div className="flex items-center gap-3 py-4 text-xs text-muted-foreground animate-fade-in-up">
-                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shadow-2xs">
+              <div className="flex items-start gap-3 py-2 animate-fade-in-up">
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/15 border border-primary/25 shadow-sm shrink-0">
                   <RotateCw className="w-4 h-4 animate-spin text-primary" />
                 </div>
-                <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 shadow-2xs">
-                  <span className="font-medium text-foreground">
-                    Đang phân tích ngữ cảnh tài liệu và kiểm chứng các trích dẫn...
-                  </span>
+                <div className="flex-1 space-y-2 pt-1">
+                  <div className="h-3 w-48 bg-gradient-to-r from-muted via-muted/60 to-muted rounded-full shimmer-sweep" />
+                  <div className="h-3 w-64 bg-gradient-to-r from-muted via-muted/60 to-muted rounded-full shimmer-sweep" style={{ animationDelay: '0.2s' }} />
+                  <div className="h-3 w-40 bg-gradient-to-r from-muted via-muted/60 to-muted rounded-full shimmer-sweep" style={{ animationDelay: '0.4s' }} />
                 </div>
               </div>
             )}

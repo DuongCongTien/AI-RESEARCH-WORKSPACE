@@ -10,7 +10,7 @@ interface DocumentListProps {
   documents: DocumentItem[];
   selectedDocumentIds: string[];
   onToggleSelect: (id: string) => void;
-  onUploaded: (doc: DocumentItem) => void;
+  onUploaded: (doc: DocumentItem | DocumentItem[]) => void;
   onDelete: (id: string) => void;
 }
 

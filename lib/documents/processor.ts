@@ -72,7 +72,24 @@ export async function processDocumentFile(
     };
   }
 
-  const textContent = parsed.text;
+  const textContent = (parsed.text || '').trim();
+  if (textContent.length === 0) {
+    return {
+      fileName,
+      fileType: extension,
+      mimeType,
+      fileSize,
+      textContent: '',
+      pageCount: parsed.pageCount || 1,
+      wordCount: 0,
+      tokensCount: 0,
+      chunks: [],
+      parsedMarkdown: '',
+      status: 'failed',
+      errorMsg: `Tài liệu ${fileName} không chứa văn bản đọc được (có thể là tệp PDF scan hoặc ảnh). Vui lòng sử dụng tệp có lớp văn bản.`,
+    };
+  }
+
   const wordCount = parsed.wordCount || textContent.split(/\s+/).filter(Boolean).length;
   const pageCount = parsed.pageCount || Math.max(1, Math.ceil(textContent.length / 2500));
   const tokensCount = Math.round(wordCount * 1.33);

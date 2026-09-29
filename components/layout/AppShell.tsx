@@ -46,8 +46,9 @@ export function AppShell({ children }: AppShellProps) {
     loadNavData();
   }, []);
 
-  const handleDocumentUploaded = (newDoc: DocumentItem) => {
-    setDocuments((prev) => [newDoc, ...prev]);
+  const handleDocumentUploaded = (uploaded: DocumentItem | DocumentItem[]) => {
+    const newDocs = Array.isArray(uploaded) ? uploaded : [uploaded];
+    setDocuments((prev) => [...newDocs, ...prev]);
     setIsUploadOpen(false);
   };
 

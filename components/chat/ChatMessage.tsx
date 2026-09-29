@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ChatMessage as ChatMessageType } from '@/types';
 import { ResearchResponse as ResearchResponseType } from '@/types/research';
 import { ResearchResponse } from '@/components/research/ResearchResponse';
+import { MarkdownContent } from '@/components/research/MarkdownContent';
 import { Bot, User, Copy, Check, RotateCw, Loader2 } from 'lucide-react';
 
 interface ChatMessageProps {
@@ -112,14 +113,14 @@ export function ChatMessage({
   return (
     <div
       className={`flex gap-3 sm:gap-4 my-4 w-full ${
-        isUser ? 'flex-row-reverse pl-6 sm:pl-16' : 'pr-2 sm:pr-8'
+        isUser ? 'flex-row-reverse pl-4 sm:pl-12' : 'pr-2 sm:pr-6'
       } animate-fade-in-up`}
     >
-      {/* Ảnh đại diện */}
+      {/* Avatar */}
       <div
-        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
+        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform hover:scale-105 ${
           isUser
-            ? 'bg-primary text-primary-foreground font-semibold text-xs'
+            ? 'bg-gradient-to-br from-primary to-secondary text-primary-foreground'
             : 'bg-primary/10 text-primary border border-primary/20'
         }`}
       >
@@ -130,33 +131,33 @@ export function ChatMessage({
         )}
       </div>
 
-      {/* Khung nội dung tin nhắn */}
+      {/* Message content */}
       <div
         className={`flex flex-col flex-1 min-w-0 ${
           isUser ? 'items-end max-w-[85%]' : 'items-start max-w-full'
         }`}
       >
         {isUser ? (
-          /* Bong bóng tin nhắn người dùng */
-          <div className="rounded-2xl rounded-tr-xs px-4 py-3 bg-primary text-primary-foreground text-sm leading-relaxed shadow-xs whitespace-pre-wrap break-words">
+          /* User message bubble */
+          <div className="rounded-2xl rounded-tr-sm px-4 py-3 bg-gradient-to-br from-primary to-primary/90 text-primary-foreground text-sm leading-relaxed shadow-sm whitespace-pre-wrap break-words">
             {message.content}
           </div>
         ) : (
-          /* Khung phản hồi trợ lý AI */
-          <div className="w-full space-y-3">
+          /* AI response container */
+          <div className="w-full space-y-2.5">
             {message.structuredResponse ? (
-              /* Thẻ có cấu trúc */
+              /* Structured cards response */
               <ResearchResponse response={message.structuredResponse} />
             ) : (
-              /* Dạng văn bản thuần dự phòng */
-              <div className="rounded-2xl rounded-tl-xs px-4 py-3 bg-surface border border-border text-foreground text-sm leading-relaxed shadow-xs whitespace-pre-wrap break-words">
-                {message.content}
+              /* Plain text fallback with markdown rendering */
+              <div className="rounded-2xl rounded-tl-sm px-4 py-4 bg-surface border border-border text-foreground shadow-sm">
+                <MarkdownContent content={message.content} />
               </div>
             )}
 
-            {/* Thanh tác vụ: Sao chép & Tạo lại */}
-            <div className="flex items-center gap-2 pt-1 px-1 text-xs text-muted-foreground">
-              {/* Nút Sao chép */}
+            {/* Action bar: Copy & Regenerate */}
+            <div className="flex items-center gap-2 pt-0.5 px-1 text-xs text-muted-foreground">
+              {/* Copy button */}
               <button
                 type="button"
                 onClick={handleCopy}
@@ -177,7 +178,7 @@ export function ChatMessage({
                 )}
               </button>
 
-              {/* Nút Tạo lại */}
+              {/* Regenerate button */}
               {onRegenerate && (
                 <button
                   type="button"

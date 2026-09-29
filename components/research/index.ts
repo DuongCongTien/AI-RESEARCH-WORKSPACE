@@ -5,3 +5,4 @@ export * from './ActionsCard';
 export * from './SourcesCard';
 export * from './ResearchResponse';
 export * from './StructuredResponseView';
+export * from './MarkdownContent';

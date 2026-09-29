@@ -11,6 +11,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.82",
     "@ai-sdk/openai": "^4.0.78",
     "@base-ui/react": "^1.8.0",
     "@prisma/client": "^6.4.1",

@@ -5,7 +5,7 @@ import { UploadCloud, Loader2, Plus } from 'lucide-react';
 import { DocumentItem } from '@/types';
 
 interface DocumentUploadProps {
-  onUploaded?: (doc: DocumentItem) => void;
+  onUploaded?: (doc: DocumentItem | DocumentItem[]) => void;
   compact?: boolean;
 }
 
@@ -15,13 +15,19 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUploadFile = async (file: File) => {
+  const handleUploadFiles = async (fileList: FileList | File[]) => {
+    const files = Array.from(fileList);
+    if (files.length === 0) return;
+
     setErrorMessage(null);
     setIsUploading(true);
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      files.forEach((f) => {
+        formData.append('files', f);
+        formData.append('file', f);
+      });
 
       const res = await fetch('/api/documents', {
         method: 'POST',
@@ -33,8 +39,9 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
         throw new Error(json.error || 'Không thể tải tài liệu lên');
       }
 
-      if (onUploaded && json.data) {
-        onUploaded(json.data);
+      if (onUploaded) {
+        const uploadedDocs = json.items || (Array.isArray(json.data) ? json.data : [json.data]);
+        onUploaded(uploadedDocs);
       }
     } catch (err) {
       console.error(err);
@@ -48,18 +55,16 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleUploadFile(file);
+    if (e.target.files && e.target.files.length > 0) {
+      handleUploadFiles(e.target.files);
     }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleUploadFile(file);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleUploadFiles(e.dataTransfer.files);
     }
   };
 
@@ -69,7 +74,8 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.docx,.doc,.txt,.md"
+          accept=".pdf,.docx,.doc,.txt,.md,.json"
+          multiple
           className="hidden"
           onChange={handleFileChange}
           disabled={isUploading}
@@ -77,14 +83,14 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2 px-3 text-xs font-medium text-muted-foreground hover:border-primary/50 hover:bg-accent hover:text-foreground transition-all disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2 px-3 text-xs font-medium text-muted-foreground hover:border-primary/50 hover:bg-accent hover:text-foreground transition-all disabled:opacity-60 cursor-pointer"
         >
           {isUploading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
           ) : (
             <Plus className="h-3.5 w-3.5" />
           )}
-          <span>{isUploading ? 'Đang phân tích...' : 'Đính kèm tài liệu'}</span>
+          <span>{isUploading ? 'Đang phân tích...' : 'Đính kèm tệp tin'}</span>
         </button>
         {errorMessage && (
           <p className="mt-1.5 text-[11px] text-destructive">{errorMessage}</p>
@@ -98,7 +104,8 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.docx,.doc,.txt,.md"
+        accept=".pdf,.docx,.doc,.txt,.md,.json"
+        multiple
         className="hidden"
         onChange={handleFileChange}
         disabled={isUploading}
@@ -125,10 +132,10 @@ export function DocumentUpload({ onUploaded, compact = false }: DocumentUploadPr
           )}
         </div>
         <p className="text-xs font-medium text-foreground">
-          {isUploading ? 'Đang trích xuất nội dung và cấu trúc...' : 'Tải lên tài liệu nghiên cứu & tệp tin'}
+          {isUploading ? 'Đang trích xuất nội dung và cấu trúc...' : 'Tải lên tài liệu nghiên cứu (Hỗ trợ nhiều tệp)'}
         </p>
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Hỗ trợ PDF, DOCX, TXT, MD
+          Hỗ trợ PDF, DOCX, TXT, MD, JSON
         </p>
       </div>
       {errorMessage && (

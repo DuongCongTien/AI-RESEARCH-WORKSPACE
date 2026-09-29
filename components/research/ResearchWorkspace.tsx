@@ -283,9 +283,10 @@ export function ResearchWorkspace({
     setSelectedDocIds((prev) => prev.filter((dId) => dId !== id));
   };
 
-  const handleDocumentUploaded = (newDoc: DocumentItem) => {
-    setDocuments((prev) => [newDoc, ...prev]);
-    setSelectedDocIds((prev) => [newDoc.id, ...prev]);
+  const handleDocumentUploaded = (uploaded: DocumentItem | DocumentItem[]) => {
+    const newDocs = Array.isArray(uploaded) ? uploaded : [uploaded];
+    setDocuments((prev) => [...newDocs, ...prev]);
+    setSelectedDocIds((prev) => [...newDocs.map((d) => d.id), ...prev]);
     setIsUploadOpen(false);
   };
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDatabaseAvailable } from '@/lib/prisma';
 import {
   getSharedConversationById,
   deleteSharedConversation,
@@ -13,41 +13,43 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    try {
-      const conv = await prisma.conversation.findUnique({
-        where: { id },
-        include: {
-          messages: {
-            orderBy: { createdAt: 'asc' },
-          },
-          conversationDocuments: {
-            include: { document: true },
-          },
-        },
-      });
-
-      if (conv) {
-        return NextResponse.json({
-          success: true,
-          data: {
-            id: conv.id,
-            title: conv.title,
-            createdAt: conv.createdAt.toISOString(),
-            updatedAt: conv.updatedAt.toISOString(),
-            documentIds: conv.conversationDocuments?.map((cd) => cd.documentId) || [],
-            messages: conv.messages.map((m) => ({
-              id: m.id,
-              conversationId: m.conversationId,
-              role: m.role as 'user' | 'assistant' | 'system',
-              content: m.content,
-              structuredResponse: safeParseResearchResponse(m.structuredData),
-              createdAt: m.createdAt.toISOString(),
-            })),
+    if (await isDatabaseAvailable()) {
+      try {
+        const conv = await prisma.conversation.findUnique({
+          where: { id },
+          include: {
+            messages: {
+              orderBy: { createdAt: 'asc' },
+            },
+            conversationDocuments: {
+              include: { document: true },
+            },
           },
         });
+
+        if (conv) {
+          return NextResponse.json({
+            success: true,
+            data: {
+              id: conv.id,
+              title: conv.title,
+              createdAt: conv.createdAt.toISOString(),
+              updatedAt: conv.updatedAt.toISOString(),
+              documentIds: conv.conversationDocuments?.map((cd) => cd.documentId) || [],
+              messages: conv.messages.map((m) => ({
+                id: m.id,
+                conversationId: m.conversationId,
+                role: m.role as 'user' | 'assistant' | 'system',
+                content: m.content,
+                structuredResponse: safeParseResearchResponse(m.structuredData),
+                createdAt: m.createdAt.toISOString(),
+              })),
+            },
+          });
+        }
+      } catch (dbErr) {
+        console.warn('Prisma conversation by ID fetch warning:', dbErr);
       }
-    } catch (dbErr) {
-      console.warn('Prisma conversation by ID fetch warning:', dbErr);
     }
 
     // Check shared memory store
@@ -84,24 +86,27 @@ export async function PATCH(
     const body = await req.json().catch(() => ({}));
     const { title } = body;
 
-    try {
-      const updated = await prisma.conversation.update({
-        where: { id },
-        data: {
-          title: title || undefined,
-          updatedAt: new Date(),
-        },
-      });
-      return NextResponse.json({ success: true, data: updated });
-    } catch {
-      // Memory store fallback
-      const updated = updateSharedConversation(id, (c) => ({
-        ...c,
-        title: title || c.title,
-        updatedAt: new Date().toISOString(),
-      }));
-      return NextResponse.json({ success: true, data: updated });
+    if (await isDatabaseAvailable()) {
+      try {
+        const updated = await prisma.conversation.update({
+          where: { id },
+          data: {
+            title: title || undefined,
+            updatedAt: new Date(),
+          },
+        });
+        return NextResponse.json({ success: true, data: updated });
+      } catch {
+        // Memory store fallback
+      }
     }
+
+    const updated = updateSharedConversation(id, (c) => ({
+      ...c,
+      title: title || c.title,
+      updatedAt: new Date().toISOString(),
+    }));
+    return NextResponse.json({ success: true, data: updated });
   } catch (err) {
     return NextResponse.json(
       { success: false, error: err instanceof Error ? err.message : 'Lỗi cập nhật' },
@@ -116,10 +121,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    try {
-      await prisma.conversation.delete({ where: { id } });
-    } catch {
-      // Ignore if not present in DB
+    if (await isDatabaseAvailable()) {
+      try {
+        await prisma.conversation.delete({ where: { id } });
+      } catch {
+        // Ignore if not present in DB
+      }
     }
     deleteSharedConversation(id);
     return NextResponse.json({ success: true, message: 'Đã xóa cuộc trò chuyện' });

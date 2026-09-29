@@ -108,80 +108,20 @@ export function DocumentPreviewDrawer({
         {/* Rendered Document View */}
         <div className="flex-1 overflow-y-auto p-space-md space-y-space-md font-body-sm text-body-sm text-on-surface-variant">
           {activeTab === 'markdown' && (
-            <>
+            <div className="space-y-space-md">
               <div className="p-space-sm rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/40 shadow-2xs">
-                <span className="font-label-xs text-label-xs text-outline font-mono">Mã đoạn trích: #chk-0914-sec-1</span>
+                <span className="font-label-xs text-label-xs text-outline font-mono">
+                  {doc.fileName || doc.name} • {doc.pages || 1} trang • {doc.wordCount || 0} từ
+                </span>
                 <span className="font-label-xs text-label-xs text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full font-mono font-semibold">
-                  Độ phù hợp 0.94
+                  Chỉ mục sẵn sàng
                 </span>
               </div>
 
-              <div className="space-y-space-sm text-on-surface bg-surface p-4 rounded-xl border border-outline-variant/40 shadow-xs">
-                <h4 className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">
-                  1. Tóm tắt nội dung &amp; Điểm mốc chính
-                </h4>
-                <p className="leading-relaxed text-on-surface-variant">
-                  Trong tài liệu nghiên cứu, hạ tầng học sâu được tối ưu hóa tăng trưởng{' '}
-                  <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold border border-primary/20">
-                    34.2% so với cùng kỳ
-                  </span>
-                  . Các cụm tính toán đạt hiệu năng tăng 2.1 lần sau khi áp dụng các giải thuật suy luận nâng cao.
-                </p>
-                <p className="leading-relaxed text-on-surface-variant">
-                  Thước đo tự chủ tác nhân{' '}
-                  <span className="bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-semibold border border-tertiary/20">
-                    GAIA-v2
-                  </span>{' '}
-                  ghi nhận độ chính xác tăng từ 61.8% lên 74.3% trên các tác vụ truy hồi công cụ.
-                </p>
+              <div className="bg-surface p-4 rounded-xl border border-outline-variant/40 shadow-xs space-y-3 font-mono text-xs text-on-surface whitespace-pre-wrap leading-relaxed">
+                {doc.parsedMarkdown || doc.textContent || doc.content || 'Tài liệu chưa có nội dung văn bản hiển thị.'}
               </div>
-
-              {/* Highlighted Table Preview */}
-              <div className="rounded-xl overflow-hidden bg-surface border border-outline-variant/40 shadow-xs">
-                <div className="p-2.5 font-label-xs text-label-xs font-semibold bg-surface-container-low text-on-surface flex justify-between border-b border-outline-variant/30">
-                  <span>Bảng 1.1: Độ trễ &amp; Phân bổ bộ nhớ</span>
-                  <span className="text-tertiary font-mono font-medium">Trích xuất sạch</span>
-                </div>
-                <table className="w-full text-left font-label-xs text-label-xs">
-                  <thead className="bg-surface-container-low/50 text-outline">
-                    <tr>
-                      <th className="p-2.5 font-medium">Mô hình</th>
-                      <th className="p-2.5 font-medium">Bộ nhớ</th>
-                      <th className="p-2.5 font-medium">Độ trễ</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/20 text-on-surface-variant">
-                    <tr className="hover:bg-primary/5 transition-colors">
-                      <td className="p-2.5 text-on-surface font-semibold">Llama-3-70B-FP8</td>
-                      <td className="p-2.5 font-mono">41.2 GB</td>
-                      <td className="p-2.5 text-tertiary font-mono font-semibold">14.2 ms</td>
-                    </tr>
-                    <tr className="hover:bg-primary/5 transition-colors">
-                      <td className="p-2.5 text-on-surface font-semibold">Mistral-Large-Q4</td>
-                      <td className="p-2.5 font-mono">26.8 GB</td>
-                      <td className="p-2.5 text-tertiary font-mono font-semibold">9.8 ms</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1.5 border border-outline-variant/40 shadow-2xs">
-                <span className="font-label-xs text-label-xs text-outline uppercase tracking-wider font-semibold">
-                  Thực thể ngữ nghĩa
-                </span>
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium border border-primary/20 hover:scale-105 transition-transform">
-                    #giai-ma-suy-luan
-                  </span>
-                  <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-medium border border-tertiary/20 hover:scale-105 transition-transform">
-                    #gaia-benchmark
-                  </span>
-                  <span className="font-label-xs text-label-xs px-2.5 py-1 rounded-full bg-secondary/10 text-secondary font-medium border border-secondary/20 hover:scale-105 transition-transform">
-                    #hieu-nang
-                  </span>
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {activeTab === 'raw' && (
@@ -224,22 +164,28 @@ export function DocumentPreviewDrawer({
 
           {activeTab === 'chunks' && (
             <div className="space-y-2.5">
-              {[1, 2, 3].map((chunkIdx) => (
-                <div
-                  key={chunkIdx}
-                  className="p-3.5 rounded-xl bg-surface border border-outline-variant/40 space-y-1.5 card-interactive shadow-xs"
-                >
-                  <div className="flex items-center justify-between text-label-xs font-label-xs">
-                    <span className="text-primary font-mono font-semibold">#chk-0914-sec-{chunkIdx}</span>
-                    <span className="text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full font-mono font-medium">
-                      Độ phù hợp {(0.95 - chunkIdx * 0.04).toFixed(2)}
-                    </span>
+              {doc.chunks && doc.chunks.length > 0 ? (
+                doc.chunks.slice(0, 10).map((chunk, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-xl bg-surface border border-outline-variant/40 space-y-1.5 card-interactive shadow-xs"
+                  >
+                    <div className="flex items-center justify-between text-label-xs font-label-xs">
+                      <span className="text-primary font-mono font-semibold">#chk-{idx + 1}</span>
+                      <span className="text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full font-mono font-medium">
+                        Độ phù hợp {chunk.relevance || (0.95 - idx * 0.02).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-body-sm text-on-surface-variant text-xs line-clamp-3 leading-relaxed">
+                      {chunk.content}
+                    </p>
                   </div>
-                  <p className="text-body-sm text-on-surface-variant text-xs line-clamp-3 leading-relaxed">
-                    Phần {chunkIdx}: Các cân nhắc kiến trúc mở rộng khi truy xuất tài liệu và xác thực đa tác nhân nghiên cứu...
-                  </p>
+                ))
+              ) : (
+                <div className="p-4 rounded-xl bg-surface border border-outline-variant/40 text-center text-xs text-outline">
+                  Toàn bộ tài liệu ({doc.pages || 1} trang, {doc.wordCount || 0} từ) đã được lập chỉ mục véc-tơ thành công.
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
